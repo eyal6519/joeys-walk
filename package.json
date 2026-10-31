@@ -1,0 +1,30 @@
+{
+  "name": "walklogger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Joey's Log - potty and walk tracking for a toy poodle, built on Firebase.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace @walklogger/web",
+    "build": "npm run build --workspace @walklogger/web",
+    "lint": "npm run lint --workspace @walklogger/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check:env": "node scripts/check-env.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "emulators": "firebase emulators:start",
+    "deploy:hosting": "npm run build && firebase deploy --only hosting",
+    "deploy:rules": "firebase deploy --only firestore:rules,firestore:indexes,storage"
+  },
+  "devDependencies": {
+    "firebase-tools": "15.34.2",
+    "prettier": "3.9.10"
+  }
+}

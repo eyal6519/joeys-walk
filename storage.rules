@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// =============================================================================
+// WalkLogger - Cloud Storage security rules
+//
+// NOTE (phase 0): deny-all baseline. Household-scoped rules land in phase 7
+// alongside optional log photos.
+// =============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

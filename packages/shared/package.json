@@ -1,0 +1,20 @@
+{
+  "name": "@walklogger/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Domain model, Zod schemas and shared constants used by the web app and Cloud Functions.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

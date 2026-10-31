@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # CI only needs the build to compile, so it uses syntactically valid
+      # placeholder values. These are never secrets: the real config is public
+      # browser config. Nothing here contacts Firebase.
+      - name: Create placeholder env for the build
+        run: |
+          cat > apps/web/.env.local <<'EOF'
+          NEXT_PUBLIC_FIREBASE_API_KEY=ci-placeholder-api-key
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=ci-placeholder.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID=ci-placeholder
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=ci-placeholder.firebasestorage.app
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=000000000000
+          NEXT_PUBLIC_FIREBASE_APP_ID=1:000000000000:web:0000000000000000000000
+          NEXT_PUBLIC_USE_EMULATORS=false
+          EOF
+
+      - run: npm ci
+
+      - name: Verify env guard passes
+        run: npm run check:env
+
+      - run: npm run format:check
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm run test
+
+      - run: npm run build

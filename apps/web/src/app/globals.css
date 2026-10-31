@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens for Joey's Log.
+ *
+ * Tailwind v4 reads `@theme` and generates utilities from these variables, so
+ * `--color-brand` becomes `bg-brand`, `text-brand`, `border-brand`, etc.
+ * Expressing them as CSS custom properties (rather than a JS object) means the
+ * dark-mode override below stays a pure CSS concern.
+ */
+@theme {
+  --color-surface: #fff7f2;
+  --color-surface-raised: #ffffff;
+  --color-ink: #2c2230;
+  --color-ink-muted: #7a6b80;
+  --color-brand: #e8749b;
+  --color-brand-strong: #cf5580;
+  --color-brand-soft: #fde8ef;
+  --color-line: #f0dfe4;
+  --color-success: #4f9d69;
+  --color-danger: #c8503f;
+
+  --radius-card: 1rem;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+}
+
+/*
+ * Dark mode follows the OS. Tokens are redefined once here rather than every
+ * utility being duplicated with `dark:` variants, which keeps markup small.
+ */
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-surface: #17121a;
+    --color-surface-raised: #221a26;
+    --color-ink: #f4eef6;
+    --color-ink-muted: #a99cae;
+    --color-brand: #f08bb0;
+    --color-brand-strong: #f6a9c4;
+    --color-brand-soft: #2e1f27;
+    --color-line: #372b3c;
+  }
+}
+
+@layer base {
+  html {
+    /* Stop iOS Safari from auto-inflating text in landscape. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    /* dvh keeps the layout correct behind mobile browser chrome. */
+    min-height: 100dvh;
+  }
+
+  /* Respect users who ask for less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
