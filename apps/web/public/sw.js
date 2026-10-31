@@ -9,11 +9,13 @@
  *
  * Strategies:
  *   - navigations: network first, then the cached page, then the offline page.
- *   - same-origin static assets: stale-while-revalidate.
+ *   - same-origin static assets: network first, then the cached copy. The build
+ *     does not content-hash chunk filenames, so a cached-first strategy would
+ *     keep serving a stale stylesheet/bundle under an unchanged URL.
  *   - everything else (Firestore, Auth, Google APIs): untouched.
  */
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL_CACHE = `walklogger-shell-${VERSION}`;
 const ASSET_CACHE = `walklogger-assets-${VERSION}`;
 const OFFLINE_URL = '/offline';
@@ -68,7 +70,7 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/icons') ||
     url.pathname.endsWith('.woff2')
   ) {
-    event.respondWith(staleWhileRevalidate(request));
+    event.respondWith(networkFirstAsset(request));
   }
 });
 
@@ -84,14 +86,14 @@ async function networkFirstNavigation(request) {
   }
 }
 
-async function staleWhileRevalidate(request) {
+async function networkFirstAsset(request) {
   const cache = await caches.open(ASSET_CACHE);
-  const cached = await cache.match(request);
-  const network = fetch(request)
-    .then((response) => {
-      if (response && response.ok) cache.put(request, response.clone());
-      return response;
-    })
-    .catch(() => undefined);
-  return cached || (await network) || Response.error();
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    const cached = await cache.match(request);
+    return cached || Response.error();
+  }
 }
