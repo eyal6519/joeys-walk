@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { siteConfig } from '@walklogger/shared';
 
+import { AppFrame } from '@/components/app-frame';
 import { Providers } from '@/providers/providers';
 
 import './globals.css';
@@ -44,7 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={siteConfig.locale} dir="ltr">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppFrame>{children}</AppFrame>
+        </Providers>
       </body>
     </html>
   );

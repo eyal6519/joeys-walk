@@ -39,3 +39,6 @@ yarn-error.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Kilo / agent tooling state (worktrees live in .kilo/worktrees)
+.kilo/
