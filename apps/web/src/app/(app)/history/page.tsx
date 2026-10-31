@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 
-import { AppShell } from '@/components/app-shell';
 import { LogItem } from '@/components/log-item';
 import { EmptyState, PageHeader, cx, inputClass } from '@/components/ui';
 import {
@@ -121,9 +120,5 @@ function History() {
 }
 
 export default function HistoryPage() {
-  return (
-    <AppShell>
-      <History />
-    </AppShell>
-  );
+  return <History />;
 }

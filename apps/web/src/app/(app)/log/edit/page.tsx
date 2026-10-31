@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { AppShell } from '@/components/app-shell';
 import { LogForm } from '@/components/log-form';
 import { Button, EmptyState, PageHeader, Spinner } from '@/components/ui';
 import { deleteLog, updateLog } from '@/lib/data/logs';
@@ -71,10 +70,8 @@ function EditLog() {
 
 export default function EditLogPage() {
   return (
-    <AppShell hideNav>
-      <Suspense fallback={<Spinner />}>
-        <EditLog />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<Spinner />}>
+      <EditLog />
+    </Suspense>
   );
 }

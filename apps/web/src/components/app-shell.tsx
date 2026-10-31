@@ -76,13 +76,9 @@ function BottomNav() {
 }
 
 /** Requires sign-in and an active household; renders the page inside the main layout. */
-export function AppShell({
-  children,
-  hideNav = false,
-}: {
-  children: ReactNode;
-  hideNav?: boolean;
-}) {
+export function AppShell({ children }: { children: ReactNode }) {
+  // The logging screens are focused tasks, so the bottom nav is hidden there.
+  const hideNav = usePathname().startsWith('/log');
   return (
     <SignedInOnly>
       <HouseholdProvider>

@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 
-import { AppShell } from '@/components/app-shell';
 import { LogForm } from '@/components/log-form';
 import { PageHeader, Spinner } from '@/components/ui';
 import { createLog } from '@/lib/data/logs';
@@ -54,10 +53,8 @@ function NewLog() {
 
 export default function NewLogPage() {
   return (
-    <AppShell hideNav>
-      <Suspense fallback={<Spinner />}>
-        <NewLog />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<Spinner />}>
+      <NewLog />
+    </Suspense>
   );
 }

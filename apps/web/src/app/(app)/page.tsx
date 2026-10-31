@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 import { startOfDay } from '@walklogger/shared';
 
-import { AppShell } from '@/components/app-shell';
 import { LogItem } from '@/components/log-item';
 import { TodaySummary } from '@/components/today-summary';
 import { buttonClass, EmptyState, PageHeader } from '@/components/ui';
@@ -57,9 +56,5 @@ function Dashboard() {
 }
 
 export default function HomePage() {
-  return (
-    <AppShell>
-      <Dashboard />
-    </AppShell>
-  );
+  return <Dashboard />;
 }

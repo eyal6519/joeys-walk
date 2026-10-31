@@ -12,7 +12,6 @@ import {
   walkerBreakdown,
 } from '@walklogger/shared';
 
-import { AppShell } from '@/components/app-shell';
 import { Card, cx, EmptyState, PageHeader, Spinner } from '@/components/ui';
 import { useHousehold } from '@/providers/household-provider';
 
@@ -135,9 +134,5 @@ function Stats() {
 }
 
 export default function StatsPage() {
-  return (
-    <AppShell>
-      <Stats />
-    </AppShell>
-  );
+  return <Stats />;
 }

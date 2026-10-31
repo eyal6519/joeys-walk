@@ -1,6 +1,5 @@
 'use client';
 
-import { AppShell } from '@/components/app-shell';
 import { AccountSection } from '@/components/settings/account-section';
 import { DogSection } from '@/components/settings/dog-section';
 import { InviteSection } from '@/components/settings/invite-section';
@@ -22,9 +21,5 @@ function Settings() {
 }
 
 export default function SettingsPage() {
-  return (
-    <AppShell>
-      <Settings />
-    </AppShell>
-  );
+  return <Settings />;
 }
