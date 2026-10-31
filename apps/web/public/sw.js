@@ -15,7 +15,7 @@
  *   - everything else (Firestore, Auth, Google APIs): untouched.
  */
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL_CACHE = `walklogger-shell-${VERSION}`;
 const ASSET_CACHE = `walklogger-assets-${VERSION}`;
 const OFFLINE_URL = '/offline';
