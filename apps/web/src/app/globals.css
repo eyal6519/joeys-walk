@@ -14,7 +14,8 @@
   --color-ink: #2c2230;
   --color-ink-muted: #7a6b80;
   --color-brand: #e8749b;
-  --color-brand-strong: #cf5580;
+  --color-brand-strong: #c24470;
+  --color-on-brand: #ffffff;
   --color-brand-soft: #fde8ef;
   --color-line: #f0dfe4;
   --color-success: #4f9d69;
@@ -39,6 +40,7 @@
     --color-ink-muted: #a99cae;
     --color-brand: #f08bb0;
     --color-brand-strong: #f6a9c4;
+    --color-on-brand: #2a1420;
     --color-brand-soft: #2e1f27;
     --color-line: #372b3c;
   }

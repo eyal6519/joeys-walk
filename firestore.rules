@@ -3,15 +3,222 @@ rules_version = '2';
 // =============================================================================
 // WalkLogger - Firestore security rules
 //
-// NOTE (phase 0): this is the "secure by default" baseline. Every document is
-// denied. Real household-scoped rules with schema validation land in phase 2.
-// Deploying this is always safe: it exposes nothing.
+// This file is the trust boundary of the whole app: there is no API server.
+//
+//   users/{uid}                own profile + active household
+//   households/{hid}           household + dog profile
+//     members/{uid}            membership (source of truth for access)
+//     places/{placeId}         user-defined places at home
+//     logs/{logId}             walks and home finds
+//   invites/{code}             join codes (get-only: codes are unguessable)
+//
+// Everything is denied unless a rule below allows it.
 // =============================================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function householdPath(hid) {
+      return /databases/$(database)/documents/households/$(hid);
+    }
+
+    function memberPath(hid, uid) {
+      return /databases/$(database)/documents/households/$(hid)/members/$(uid);
+    }
+
+    function invitePath(code) {
+      return /databases/$(database)/documents/invites/$(code);
+    }
+
+    function isMember(hid) {
+      return signedIn() && exists(memberPath(hid, request.auth.uid));
+    }
+
+    function isOwner(hid) {
+      return isMember(hid) && get(memberPath(hid, request.auth.uid)).data.role == 'owner';
+    }
+
+    function optionalString(value, maxLen) {
+      return value == null || (value is string && value.size() <= maxLen);
+    }
+
+    function shortString(value, minLen, maxLen) {
+      return value is string && value.size() >= minLen && value.size() <= maxLen;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['householdId', 'displayName', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['householdId', 'updatedAt'])
+        && optionalString(request.resource.data.householdId, 64)
+        && optionalString(request.resource.data.get('displayName', null), 80)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /invites/{code} {
+      // `get` only: knowing the code is the capability. Listing is never allowed.
+      allow get: if signedIn();
+      allow list: if false;
+
+      allow create: if signedIn()
+        && isMember(request.resource.data.householdId)
+        && request.resource.data.keys().hasOnly(['householdId', 'householdName', 'dogName', 'createdBy', 'createdAt', 'expiresAt'])
+        && request.resource.data.keys().hasAll(['householdId', 'householdName', 'dogName', 'createdBy', 'createdAt', 'expiresAt'])
+        && request.resource.data.createdBy == request.auth.uid
+        && shortString(code, 16, 64)
+        && shortString(request.resource.data.householdName, 1, 60)
+        && shortString(request.resource.data.dogName, 1, 40)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt <= request.time + duration.value(8, 'd');
+      allow update: if false;
+      allow delete: if signedIn() && isMember(resource.data.householdId);
+    }
+
+    match /households/{hid} {
+      allow read: if isMember(hid);
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['name', 'ownerUid', 'dogName', 'dogBreed', 'dogBirthDate', 'createdAt'])
+        && request.resource.data.keys().hasAll(['name', 'ownerUid', 'dogName', 'dogBreed', 'dogBirthDate', 'createdAt'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && shortString(request.resource.data.name, 1, 60)
+        && shortString(request.resource.data.dogName, 1, 40)
+        && optionalString(request.resource.data.dogBreed, 60)
+        && (request.resource.data.dogBirthDate == null || request.resource.data.dogBirthDate is timestamp)
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isOwner(hid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'dogName', 'dogBreed', 'dogBirthDate'])
+        && shortString(request.resource.data.name, 1, 60)
+        && shortString(request.resource.data.dogName, 1, 40)
+        && optionalString(request.resource.data.dogBreed, 60)
+        && (request.resource.data.dogBirthDate == null || request.resource.data.dogBirthDate is timestamp);
+
+      allow delete: if false;
+
+      match /members/{uid} {
+        allow read: if isMember(hid);
+
+        allow create: if signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['displayName', 'role', 'joinedAt', 'inviteCode'])
+          && request.resource.data.keys().hasAll(['displayName', 'role', 'joinedAt'])
+          && shortString(request.resource.data.displayName, 1, 80)
+          && request.resource.data.joinedAt == request.time
+          && (
+            // Founding owner: the household is created in the same batch.
+            (
+              request.resource.data.role == 'owner'
+              && !exists(householdPath(hid))
+              && getAfter(householdPath(hid)).data.ownerUid == request.auth.uid
+            )
+            ||
+            // Joining with a valid, unexpired invite for THIS household.
+            (
+              request.resource.data.role == 'member'
+              && request.resource.data.inviteCode is string
+              && get(invitePath(request.resource.data.inviteCode)).data.householdId == hid
+              && get(invitePath(request.resource.data.inviteCode)).data.expiresAt > request.time
+            )
+          );
+
+        // A member may rename themselves; role and join data are immutable.
+        allow update: if signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName'])
+          && shortString(request.resource.data.displayName, 1, 80);
+
+        // Leave the household, or the owner removes someone else.
+        allow delete: if signedIn()
+          && ((request.auth.uid == uid && resource.data.role != 'owner')
+              || (isOwner(hid) && request.auth.uid != uid));
+      }
+
+      match /places/{placeId} {
+        function validPlace(data) {
+          return data.keys().hasOnly(['label', 'icon', 'order', 'archived'])
+            && data.keys().hasAll(['label', 'order', 'archived'])
+            && shortString(data.label, 1, 40)
+            && optionalString(data.get('icon', null), 8)
+            && data.order is number
+            && data.archived is bool;
+        }
+
+        allow read: if isMember(hid);
+        allow create, update: if isMember(hid) && validPlace(request.resource.data);
+        allow delete: if isMember(hid);
+      }
+
+      match /logs/{logId} {
+        function logKeys() {
+          return [
+            'type', 'occurredAt', 'pee', 'poop', 'note',
+            'placeId', 'placeLabel', 'walkerUid', 'walkerName', 'durationMin',
+            'createdBy', 'createdByName', 'createdAt', 'updatedAt'
+          ];
+        }
+
+        function validHomeLog(data) {
+          return data.type == 'home'
+            && (data.pee || data.poop)
+            && optionalString(data.placeId, 64)
+            && shortString(data.placeLabel, 1, 60)
+            && data.walkerUid == null
+            && data.walkerName == null
+            && data.durationMin == null;
+        }
+
+        function validWalkLog(data) {
+          return data.type == 'walk'
+            && data.placeId == null
+            && data.placeLabel == null
+            && optionalString(data.walkerUid, 64)
+            && shortString(data.walkerName, 1, 60)
+            && (data.durationMin == null
+                || (data.durationMin is int && data.durationMin >= 0 && data.durationMin <= 1440));
+        }
+
+        function validLog(data) {
+          return data.keys().hasOnly(logKeys())
+            && data.keys().hasAll(logKeys())
+            && data.pee is bool
+            && data.poop is bool
+            && data.occurredAt is timestamp
+            && data.occurredAt <= request.time + duration.value(10, 'm')
+            && optionalString(data.note, 500)
+            && shortString(data.createdByName, 1, 80)
+            && (validHomeLog(data) || validWalkLog(data));
+        }
+
+        allow read: if isMember(hid);
+
+        allow create: if isMember(hid)
+          && validLog(request.resource.data)
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+
+        // Any member may correct an entry (forgetting to stop the timer is common);
+        // authorship, type and creation time are immutable.
+        allow update: if isMember(hid)
+          && validLog(request.resource.data)
+          && request.resource.data.type == resource.data.type
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.updatedAt == request.time;
+
+        allow delete: if isMember(hid)
+          && (resource.data.createdBy == request.auth.uid || isOwner(hid));
+      }
     }
   }
 }
