@@ -1,4 +1,10 @@
-import { formatAgo, lastPottyAt, startOfDay, summarize, type LogRecord } from '@walklogger/shared';
+import {
+  formatAgo,
+  lastPottyAt,
+  startOfDay,
+  summarize,
+  type LogRecord,
+} from '@walklogger/shared';
 
 import { Card } from './ui';
 
@@ -11,7 +17,15 @@ function Stat({ value, label }: { value: number; label: string }) {
   );
 }
 
-export function TodaySummary({ logs, now, dogName }: { logs: LogRecord[]; now: Date; dogName: string }) {
+export function TodaySummary({
+  logs,
+  now,
+  dogName,
+}: {
+  logs: LogRecord[];
+  now: Date;
+  dogName: string;
+}) {
   const start = startOfDay(now);
   const today = logs.filter((log) => log.occurredAt >= start);
   const summary = summarize(today);

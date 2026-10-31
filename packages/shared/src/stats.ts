@@ -2,7 +2,14 @@ import type { LogRecord } from './domain';
 
 export type StatLog = Pick<
   LogRecord,
-  'type' | 'occurredAt' | 'pee' | 'poop' | 'walkerUid' | 'walkerName' | 'durationMin' | 'placeLabel'
+  | 'type'
+  | 'occurredAt'
+  | 'pee'
+  | 'poop'
+  | 'walkerUid'
+  | 'walkerName'
+  | 'durationMin'
+  | 'placeLabel'
 >;
 
 export function startOfDay(date: Date): Date {
@@ -40,12 +47,23 @@ export function summarize(logs: readonly StatLog[]): Summary {
 export type DayBucket = Summary & { key: string; date: Date };
 
 /** One bucket per calendar day, oldest first, ending on the day of `now`. Empty days are kept. */
-export function dailyBuckets(logs: readonly StatLog[], days: number, now: Date): DayBucket[] {
+export function dailyBuckets(
+  logs: readonly StatLog[],
+  days: number,
+  now: Date,
+): DayBucket[] {
   const today = startOfDay(now);
   const buckets = new Map<string, DayBucket>();
   for (let offset = days - 1; offset >= 0; offset -= 1) {
     const date = addDays(today, -offset);
-    buckets.set(dayKey(date), { key: dayKey(date), date, walks: 0, homeFinds: 0, pee: 0, poop: 0 });
+    buckets.set(dayKey(date), {
+      key: dayKey(date),
+      date,
+      walks: 0,
+      homeFinds: 0,
+      pee: 0,
+      poop: 0,
+    });
   }
   for (const log of logs) {
     const bucket = buckets.get(dayKey(log.occurredAt));
@@ -94,7 +112,10 @@ export function walkerBreakdown(logs: readonly StatLog[]): WalkerStat[] {
     entry.totalMin += log.durationMin ?? 0;
     byKey.set(key, entry);
   }
-  return [...byKey.values()].sort((a, b) => b.walks - a.walks || a.name.localeCompare(b.name));
+  return [...byKey.values()].sort(
+    (a, b) =>
+      b.walks - a.walks || b.totalMin - a.totalMin || a.name.localeCompare(b.name),
+  );
 }
 
 export type PlaceStat = { label: string; count: number };
@@ -108,5 +129,7 @@ export function placeBreakdown(logs: readonly StatLog[]): PlaceStat[] {
     entry.count += 1;
     byLabel.set(key, entry);
   }
-  return [...byLabel.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  return [...byLabel.values()].sort(
+    (a, b) => b.count - a.count || a.label.localeCompare(b.label),
+  );
 }

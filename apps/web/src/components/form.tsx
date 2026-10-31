@@ -1,4 +1,9 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import {
+  useId,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type TextareaHTMLAttributes,
+} from 'react';
 
 import { cx, inputClass } from './ui';
 
@@ -12,7 +17,9 @@ export function TextField({
   ...props
 }: FieldShell & InputHTMLAttributes<HTMLInputElement>) {
   const id = useId();
-  const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-err` : null].filter(Boolean).join(' ');
+  const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-err` : null]
+    .filter(Boolean)
+    .join(' ');
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-medium">

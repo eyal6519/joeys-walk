@@ -48,16 +48,21 @@ describe('logInputSchema', () => {
 
   it('accepts a home find with free-text place', () => {
     expect(
-      logInputSchema.safeParse({ ...home(), placeId: null, placeLabel: 'Under the sofa' }).success,
+      logInputSchema.safeParse({ ...home(), placeId: null, placeLabel: 'Under the sofa' })
+        .success,
     ).toBe(true);
   });
 
   it('rejects a home find where nothing was found', () => {
-    expect(logInputSchema.safeParse({ ...home(), pee: false, poop: false }).success).toBe(false);
+    expect(logInputSchema.safeParse({ ...home(), pee: false, poop: false }).success).toBe(
+      false,
+    );
   });
 
   it('rejects a home find with no place', () => {
-    expect(logInputSchema.safeParse({ ...home(), placeLabel: '   ' }).success).toBe(false);
+    expect(logInputSchema.safeParse({ ...home(), placeLabel: '   ' }).success).toBe(
+      false,
+    );
   });
 
   it('rejects a walk without a walker name', () => {
@@ -65,7 +70,9 @@ describe('logInputSchema', () => {
   });
 
   it('rejects absurd walk durations', () => {
-    expect(logInputSchema.safeParse({ ...walk(), durationMin: 5000 }).success).toBe(false);
+    expect(logInputSchema.safeParse({ ...walk(), durationMin: 5000 }).success).toBe(
+      false,
+    );
     expect(logInputSchema.safeParse({ ...walk(), durationMin: -1 }).success).toBe(false);
     expect(logInputSchema.safeParse({ ...walk(), durationMin: 1.5 }).success).toBe(false);
   });
@@ -73,7 +80,9 @@ describe('logInputSchema', () => {
   it('rejects times well in the future but tolerates small clock skew', () => {
     const future = new Date(Date.now() + 60 * 60 * 1000);
     const skew = new Date(Date.now() + 2 * 60 * 1000);
-    expect(logInputSchema.safeParse({ ...walk(), occurredAt: future }).success).toBe(false);
+    expect(logInputSchema.safeParse({ ...walk(), occurredAt: future }).success).toBe(
+      false,
+    );
     expect(logInputSchema.safeParse({ ...walk(), occurredAt: skew }).success).toBe(true);
   });
 
@@ -85,13 +94,17 @@ describe('logInputSchema', () => {
   });
 
   it('rejects overlong notes', () => {
-    expect(logInputSchema.safeParse({ ...walk(), note: 'x'.repeat(501) }).success).toBe(false);
+    expect(logInputSchema.safeParse({ ...walk(), note: 'x'.repeat(501) }).success).toBe(
+      false,
+    );
   });
 });
 
 describe('placeInputSchema', () => {
   it('requires a label', () => {
     expect(placeInputSchema.safeParse({ label: ' ', icon: null }).success).toBe(false);
-    expect(placeInputSchema.safeParse({ label: 'Garden', icon: '🌳' }).success).toBe(true);
+    expect(placeInputSchema.safeParse({ label: 'Garden', icon: '🌳' }).success).toBe(
+      true,
+    );
   });
 });

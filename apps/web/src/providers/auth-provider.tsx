@@ -40,6 +40,7 @@ export function useAuth(): AuthState {
 
 export function useSignedIn(): Extract<AuthState, { status: 'signed-in' }> {
   const state = useContext(AuthContext);
-  if (state.status !== 'signed-in') throw new Error('useSignedIn called while signed out');
+  if (state.status !== 'signed-in')
+    throw new Error('useSignedIn called while signed out');
   return state;
 }

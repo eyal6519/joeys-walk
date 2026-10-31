@@ -42,7 +42,10 @@ export function watchActiveHousehold(
 ): Unsubscribe {
   return onSnapshot(
     userDoc(uid),
-    (snap) => onChange(snap.exists() ? ((snap.data().householdId as string | null) ?? null) : null),
+    (snap) =>
+      onChange(
+        snap.exists() ? ((snap.data().householdId as string | null) ?? null) : null,
+      ),
     onError,
   );
 }
@@ -61,13 +64,20 @@ function dogFields(input: HouseholdInput) {
 }
 
 /** Household + owner membership + default places + the user's pointer, in one atomic batch. */
-export async function createHousehold(actor: Actor, raw: HouseholdInput): Promise<string> {
+export async function createHousehold(
+  actor: Actor,
+  raw: HouseholdInput,
+): Promise<string> {
   const input = householdInputSchema.parse(raw);
   const db = getDb();
   const ref = doc(collection(db, 'households'));
   const batch = writeBatch(db);
 
-  batch.set(ref, { ...dogFields(input), ownerUid: actor.uid, createdAt: serverTimestamp() });
+  batch.set(ref, {
+    ...dogFields(input),
+    ownerUid: actor.uid,
+    createdAt: serverTimestamp(),
+  });
   batch.set(doc(ref, 'members', actor.uid), {
     displayName: actor.name,
     role: 'owner',
@@ -140,7 +150,11 @@ export async function previewInvite(code: string): Promise<InvitePreview | null>
   };
 }
 
-export async function joinHousehold(actor: Actor, code: string, householdId: string): Promise<void> {
+export async function joinHousehold(
+  actor: Actor,
+  code: string,
+  householdId: string,
+): Promise<void> {
   const batch = writeBatch(getDb());
   batch.set(doc(membersCol(householdId), actor.uid), {
     displayName: actor.name,
@@ -160,7 +174,11 @@ export function watchMembers(
   return onSnapshot(
     membersCol(hid),
     (snap) =>
-      onChange(snap.docs.map(memberFromDoc).sort((a, b) => a.displayName.localeCompare(b.displayName))),
+      onChange(
+        snap.docs
+          .map(memberFromDoc)
+          .sort((a, b) => a.displayName.localeCompare(b.displayName)),
+      ),
     onError,
   );
 }
@@ -175,4 +193,16 @@ export async function renameSelf(hid: string, uid: string, name: string): Promis
 
 export async function clearActiveHousehold(actor: Actor): Promise<void> {
   await setDoc(userDoc(actor.uid), pointerData(null, actor.name));
+}
+
+/**
+ * Leaves a household: removes the caller's membership and clears their active
+ * pointer in one batch. Owners cannot leave (rules forbid removing the owner);
+ * the UI hides the button for them.
+ */
+export async function leaveHousehold(actor: Actor, hid: string): Promise<void> {
+  const batch = writeBatch(getDb());
+  batch.delete(doc(membersCol(hid), actor.uid));
+  batch.set(userDoc(actor.uid), pointerData(null, actor.name));
+  await batch.commit();
 }

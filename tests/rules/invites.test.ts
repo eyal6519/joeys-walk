@@ -1,5 +1,17 @@
-import { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
+import {
+  assertFails,
+  assertSucceeds,
+  type RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+} from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 import { createEnv, HID, OWNER, seed, STRANGER } from './helpers';
@@ -32,7 +44,12 @@ function inviteDoc(householdId: string, expiresInMs: number) {
 }
 
 function joinDoc(inviteCode: string) {
-  return { displayName: 'Guest', role: 'member', joinedAt: serverTimestamp(), inviteCode };
+  return {
+    displayName: 'Guest',
+    role: 'member',
+    joinedAt: serverTimestamp(),
+    inviteCode,
+  };
 }
 
 describe('creating invites', () => {
@@ -73,7 +90,10 @@ describe('joining with an invite', () => {
   beforeEach(async () => {
     await env.withSecurityRulesDisabled(async (ctx) => {
       await setDoc(doc(ctx.firestore(), `invites/${code}`), inviteDoc(HID, 3600_000));
-      await setDoc(doc(ctx.firestore(), `invites/${expiredCode}`), inviteDoc(HID, -3600_000));
+      await setDoc(
+        doc(ctx.firestore(), `invites/${expiredCode}`),
+        inviteDoc(HID, -3600_000),
+      );
     });
   });
 
@@ -89,7 +109,10 @@ describe('joining with an invite', () => {
 
   it('fails when the invite belongs to a different household', async () => {
     await env.withSecurityRulesDisabled(async (ctx) => {
-      await setDoc(doc(ctx.firestore(), `invites/${'c'.repeat(32)}`), inviteDoc('other', 3600_000));
+      await setDoc(
+        doc(ctx.firestore(), `invites/${'c'.repeat(32)}`),
+        inviteDoc('other', 3600_000),
+      );
     });
     await assertFails(setDoc(doc(db(STRANGER), path), joinDoc('c'.repeat(32))));
   });

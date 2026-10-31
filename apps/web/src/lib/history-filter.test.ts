@@ -28,21 +28,34 @@ function log(id: string, partial: Partial<LogRecord>): LogRecord {
 describe('applyFilter', () => {
   const logs = [
     log('a', { occurredAt: new Date(2026, 5, 14) }),
-    log('b', { type: 'home', createdBy: 'u2', walkerUid: null, occurredAt: new Date(2026, 5, 13) }),
+    log('b', {
+      type: 'home',
+      createdBy: 'u2',
+      walkerUid: null,
+      occurredAt: new Date(2026, 5, 13),
+    }),
     log('c', { walkerUid: 'u2', occurredAt: new Date(2026, 4, 1) }),
   ];
 
   it('limits by day window', () => {
-    expect(applyFilter(logs, { ...DEFAULT_FILTER, days: 7 }, now).map((l) => l.id)).toEqual(['a', 'b']);
+    expect(
+      applyFilter(logs, { ...DEFAULT_FILTER, days: 7 }, now).map((l) => l.id),
+    ).toEqual(['a', 'b']);
     expect(applyFilter(logs, { ...DEFAULT_FILTER, days: 0 }, now)).toHaveLength(3);
   });
 
   it('filters by type', () => {
-    expect(applyFilter(logs, { ...DEFAULT_FILTER, days: 0, type: 'home' }, now).map((l) => l.id)).toEqual(['b']);
+    expect(
+      applyFilter(logs, { ...DEFAULT_FILTER, days: 0, type: 'home' }, now).map(
+        (l) => l.id,
+      ),
+    ).toEqual(['b']);
   });
 
   it('filters by person using walker for walks and author for home finds', () => {
-    const u2 = applyFilter(logs, { ...DEFAULT_FILTER, days: 0, person: 'u2' }, now).map((l) => l.id);
+    const u2 = applyFilter(logs, { ...DEFAULT_FILTER, days: 0, person: 'u2' }, now).map(
+      (l) => l.id,
+    );
     expect(u2).toEqual(['b', 'c']);
   });
 });

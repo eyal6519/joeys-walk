@@ -9,7 +9,11 @@ import { joinHousehold, previewInvite, type InvitePreview } from '@/lib/data/hou
 import { useSignedIn } from '@/providers/auth-provider';
 import { HouseholdProvider, useHouseholdState } from '@/providers/household-provider';
 
-type Load = { state: 'loading' } | { state: 'missing' } | { state: 'ready'; invite: InvitePreview } | { state: 'error'; message: string };
+type Load =
+  | { state: 'loading' }
+  | { state: 'missing' }
+  | { state: 'ready'; invite: InvitePreview }
+  | { state: 'error'; message: string };
 
 function Join() {
   const router = useRouter();
@@ -18,19 +22,19 @@ function Join() {
   const household = useHouseholdState();
   const code = params.get('code')?.trim() ?? '';
 
-  const [load, setLoad] = useState<Load>({ state: 'loading' });
+  const [load, setLoad] = useState<Load>(() =>
+    code ? { state: 'loading' } : { state: 'missing' },
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!code) {
-      setLoad({ state: 'missing' });
-      return;
-    }
+    if (!code) return;
     let cancelled = false;
     previewInvite(code)
       .then((invite) => {
-        if (!cancelled) setLoad(invite ? { state: 'ready', invite } : { state: 'missing' });
+        if (!cancelled)
+          setLoad(invite ? { state: 'ready', invite } : { state: 'missing' });
       })
       .catch((e: Error) => {
         if (!cancelled) setLoad({ state: 'error', message: e.message });
@@ -44,7 +48,11 @@ function Join() {
     setBusy(true);
     setError(null);
     try {
-      await joinHousehold({ uid: auth.user.uid, name: auth.name }, code, invite.householdId);
+      await joinHousehold(
+        { uid: auth.user.uid, name: auth.name },
+        code,
+        invite.householdId,
+      );
       router.replace('/');
     } catch {
       setError('Could not join. The invite may have expired, ask for a new one.');
@@ -68,7 +76,8 @@ function Join() {
         {load.state === 'ready' && !load.invite.expired && (
           <>
             <p>
-              You have been invited to help look after <strong>{load.invite.dogName}</strong> in{' '}
+              You have been invited to help look after{' '}
+              <strong>{load.invite.dogName}</strong> in{' '}
               <strong>{load.invite.householdName}</strong>.
             </p>
             {household.status === 'ready' && (

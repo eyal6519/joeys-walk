@@ -39,7 +39,8 @@ export function HouseholdForm({ initial, submitLabel, onSubmit }: Props) {
     });
     if (!parsed.success) {
       const next: Record<string, string> = {};
-      for (const issue of parsed.error.issues) next[String(issue.path[0])] ??= issue.message;
+      for (const issue of parsed.error.issues)
+        next[String(issue.path[0])] ??= issue.message;
       setErrors(next);
       return;
     }

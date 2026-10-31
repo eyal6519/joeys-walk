@@ -42,6 +42,20 @@ service cloud.firestore {
       return isMember(hid) && get(memberPath(hid, request.auth.uid)).data.role == 'owner';
     }
 
+    // Membership as it will be once the current atomic batch commits. Onboarding
+    // writes the household, the owner membership and the default places in one
+    // batch, and exists()/get() only see the pre-batch state, so a plain isMember()
+    // check would wrongly deny the founder on their own places.
+    function isMemberAfter(hid) {
+      return signedIn() && (
+        exists(memberPath(hid, request.auth.uid))
+        || (existsAfter(memberPath(hid, request.auth.uid))
+            && getAfter(memberPath(hid, request.auth.uid)).data.role == 'owner'
+            && existsAfter(householdPath(hid))
+            && getAfter(householdPath(hid)).data.ownerUid == request.auth.uid)
+      );
+    }
+
     function optionalString(value, maxLen) {
       return value == null || (value is string && value.size() <= maxLen);
     }
@@ -154,7 +168,8 @@ service cloud.firestore {
         }
 
         allow read: if isMember(hid);
-        allow create, update: if isMember(hid) && validPlace(request.resource.data);
+        allow create: if isMemberAfter(hid) && validPlace(request.resource.data);
+        allow update: if isMemberAfter(hid) && validPlace(request.resource.data);
         allow delete: if isMember(hid);
       }
 

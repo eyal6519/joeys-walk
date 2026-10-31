@@ -5,7 +5,12 @@ import { useMemo, useState } from 'react';
 import { AppShell } from '@/components/app-shell';
 import { LogItem } from '@/components/log-item';
 import { EmptyState, PageHeader, cx, inputClass } from '@/components/ui';
-import { applyFilter, DEFAULT_FILTER, groupByDay, type HistoryFilter } from '@/lib/history-filter';
+import {
+  applyFilter,
+  DEFAULT_FILTER,
+  groupByDay,
+  type HistoryFilter,
+} from '@/lib/history-filter';
 import { formatDayHeading } from '@/lib/utils/datetime';
 import { useHousehold } from '@/providers/household-provider';
 
@@ -27,7 +32,10 @@ function History() {
 
   return (
     <>
-      <PageHeader title="History" subtitle={`${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`} />
+      <PageHeader
+        title="History"
+        subtitle={`${filtered.length} ${filtered.length === 1 ? 'entry' : 'entries'}`}
+      />
 
       <div className="grid grid-cols-3 gap-2">
         <label className="flex flex-col gap-1 text-xs text-ink-muted">
@@ -44,7 +52,11 @@ function History() {
         </label>
         <label className="flex flex-col gap-1 text-xs text-ink-muted">
           Who
-          <select className={cx(inputClass, 'text-sm')} value={filter.person} onChange={(e) => update({ person: e.target.value })}>
+          <select
+            className={cx(inputClass, 'text-sm')}
+            value={filter.person}
+            onChange={(e) => update({ person: e.target.value })}
+          >
             <option value="all">Everyone</option>
             {members.map((m) => (
               <option key={m.uid} value={m.uid}>
@@ -58,7 +70,9 @@ function History() {
           <select
             className={cx(inputClass, 'text-sm')}
             value={filter.days}
-            onChange={(e) => update({ days: Number(e.target.value) as HistoryFilter['days'] })}
+            onChange={(e) =>
+              update({ days: Number(e.target.value) as HistoryFilter['days'] })
+            }
           >
             <option value={7}>7 days</option>
             <option value={30}>30 days</option>
@@ -69,12 +83,21 @@ function History() {
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState title="No entries match" hint="Try a longer period or clear the filters." />
+        <EmptyState
+          title="No entries match"
+          hint="Try a longer period or clear the filters."
+        />
       ) : (
         <div className="flex flex-col gap-5">
           {groups.map((group) => (
-            <section key={group.key} aria-label={formatDayHeading(group.date, now)} className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold text-ink-muted">{formatDayHeading(group.date, now)}</h2>
+            <section
+              key={group.key}
+              aria-label={formatDayHeading(group.date, now)}
+              className="flex flex-col gap-2"
+            >
+              <h2 className="text-sm font-semibold text-ink-muted">
+                {formatDayHeading(group.date, now)}
+              </h2>
               <ul className="flex flex-col gap-2">
                 {group.logs.map((log) => (
                   <LogItem key={log.id} log={log} />

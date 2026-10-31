@@ -2,7 +2,13 @@ import type { LogType } from '@walklogger/shared';
 
 import { cx } from './ui';
 
-export function LogTypeToggle({ value, onChange }: { value: LogType; onChange: (type: LogType) => void }) {
+export function LogTypeToggle({
+  value,
+  onChange,
+}: {
+  value: LogType;
+  onChange: (type: LogType) => void;
+}) {
   return (
     <div role="group" aria-label="Entry type" className="grid grid-cols-2 gap-2">
       {(['walk', 'home'] as const).map((type) => (

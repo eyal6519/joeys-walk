@@ -29,7 +29,11 @@ export function watchPlaces(
   );
 }
 
-export async function addPlace(hid: string, input: PlaceInput, order: number): Promise<void> {
+export async function addPlace(
+  hid: string,
+  input: PlaceInput,
+  order: number,
+): Promise<void> {
   const parsed = placeInputSchema.parse(input);
   await addDoc(placesCol(hid), {
     label: parsed.label,
@@ -45,7 +49,8 @@ export async function updatePlace(
   patch: Partial<Pick<Place, 'label' | 'icon' | 'archived'>>,
 ): Promise<void> {
   const data: Record<string, unknown> = {};
-  if (patch.label !== undefined) data.label = placeInputSchema.shape.label.parse(patch.label);
+  if (patch.label !== undefined)
+    data.label = placeInputSchema.shape.label.parse(patch.label);
   if (patch.icon !== undefined) data.icon = patch.icon || null;
   if (patch.archived !== undefined) data.archived = patch.archived;
   await updateDoc(doc(placesCol(hid), id), data);
@@ -54,7 +59,9 @@ export async function updatePlace(
 /** Persists a new ordering by rewriting `order` for the given ids. */
 export async function reorderPlaces(hid: string, orderedIds: string[]): Promise<void> {
   const batch = writeBatch(getDb());
-  orderedIds.forEach((id, index) => batch.update(doc(placesCol(hid), id), { order: index }));
+  orderedIds.forEach((id, index) =>
+    batch.update(doc(placesCol(hid), id), { order: index }),
+  );
   await batch.commit();
 }
 

@@ -65,7 +65,9 @@ function Stats() {
             onClick={() => setDays(range)}
             className={cx(
               'min-h-11 rounded-xl border font-medium',
-              days === range ? 'border-brand-strong bg-brand-soft text-brand-strong' : 'border-line bg-surface-raised',
+              days === range
+                ? 'border-brand-strong bg-brand-soft text-brand-strong'
+                : 'border-line bg-surface-raised',
             )}
           >
             {range} days
@@ -74,7 +76,10 @@ function Stats() {
       </div>
 
       {data.count === 0 ? (
-        <EmptyState title="No data in this period" hint="Log a walk or a find and it will show up here." />
+        <EmptyState
+          title="No data in this period"
+          hint="Log a walk or a find and it will show up here."
+        />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3">
@@ -93,7 +98,9 @@ function Stats() {
 
           {data.walkers.length > 0 && (
             <Card>
-              <h2 className="mb-3 text-sm font-semibold">Who walks {household.dogName}</h2>
+              <h2 className="mb-3 text-sm font-semibold">
+                Who walks {household.dogName}
+              </h2>
               <ul className="flex flex-col gap-2">
                 {data.walkers.map((w) => (
                   <li key={w.name} className="flex justify-between text-sm">

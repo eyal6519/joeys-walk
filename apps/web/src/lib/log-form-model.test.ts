@@ -8,7 +8,9 @@ const members: Member[] = [
   { uid: 'u1', displayName: 'Eyal', role: 'owner' },
   { uid: 'u2', displayName: 'Dana', role: 'member' },
 ];
-const places: Place[] = [{ id: 'p1', label: 'Kitchen', icon: '🍳', order: 0, archived: false }];
+const places: Place[] = [
+  { id: 'p1', label: 'Kitchen', icon: '🍳', order: 0, archived: false },
+];
 
 const base: LogFormValues = {
   type: 'walk',
@@ -36,7 +38,11 @@ describe('buildLogInput - walks', () => {
   });
 
   it('accepts "neither" and an empty duration', () => {
-    const result = buildLogInput({ ...base, potty: 'neither', duration: '' }, members, places);
+    const result = buildLogInput(
+      { ...base, potty: 'neither', duration: '' },
+      members,
+      places,
+    );
     expect(result.ok).toBe(true);
     if (result.ok && result.input.type === 'walk') {
       expect(result.input.pee || result.input.poop).toBe(false);
@@ -45,7 +51,11 @@ describe('buildLogInput - walks', () => {
   });
 
   it('supports a walker who is not a member', () => {
-    const result = buildLogInput({ ...base, walker: OTHER, walkerOther: 'Neighbour Sam' }, members, places);
+    const result = buildLogInput(
+      { ...base, walker: OTHER, walkerOther: 'Neighbour Sam' },
+      members,
+      places,
+    );
     expect(result.ok).toBe(true);
     if (result.ok && result.input.type === 'walk') {
       expect(result.input.walkerUid).toBeNull();
@@ -54,8 +64,15 @@ describe('buildLogInput - walks', () => {
   });
 
   it('requires a name for someone else', () => {
-    const result = buildLogInput({ ...base, walker: OTHER, walkerOther: '  ' }, members, places);
-    expect(result).toMatchObject({ ok: false, errors: { walkerName: expect.any(String) } });
+    const result = buildLogInput(
+      { ...base, walker: OTHER, walkerOther: '  ' },
+      members,
+      places,
+    );
+    expect(result).toMatchObject({
+      ok: false,
+      errors: { walkerName: expect.any(String) },
+    });
   });
 
   it('requires choosing what happened', () => {
@@ -66,7 +83,9 @@ describe('buildLogInput - walks', () => {
   it('rejects fractional or negative minutes and invalid dates', () => {
     expect(buildLogInput({ ...base, duration: '2.5' }, members, places).ok).toBe(false);
     expect(buildLogInput({ ...base, duration: '-3' }, members, places).ok).toBe(false);
-    expect(buildLogInput({ ...base, when: new Date('nope') }, members, places).ok).toBe(false);
+    expect(buildLogInput({ ...base, when: new Date('nope') }, members, places).ok).toBe(
+      false,
+    );
   });
 });
 
@@ -84,7 +103,11 @@ describe('buildLogInput - home finds', () => {
   });
 
   it('supports free text and stores no place id', () => {
-    const result = buildLogInput({ ...home, place: OTHER, placeOther: 'Behind the sofa' }, members, places);
+    const result = buildLogInput(
+      { ...home, place: OTHER, placeOther: 'Behind the sofa' },
+      members,
+      places,
+    );
     expect(result.ok).toBe(true);
     if (result.ok && result.input.type === 'home') {
       expect(result.input.placeId).toBeNull();
@@ -93,8 +116,15 @@ describe('buildLogInput - home finds', () => {
   });
 
   it('requires a place when typing freehand', () => {
-    const result = buildLogInput({ ...home, place: OTHER, placeOther: '' }, members, places);
-    expect(result).toMatchObject({ ok: false, errors: { placeLabel: expect.any(String) } });
+    const result = buildLogInput(
+      { ...home, place: OTHER, placeOther: '' },
+      members,
+      places,
+    );
+    expect(result).toMatchObject({
+      ok: false,
+      errors: { placeLabel: expect.any(String) },
+    });
   });
 
   it('refuses "neither" for a find at home', () => {

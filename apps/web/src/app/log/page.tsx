@@ -17,16 +17,19 @@ function NewLog() {
   const toast = useToast();
   const { household, actor } = useHousehold();
 
-  const type = params.get('type') === 'home' ? 'home' : 'walk';
-  const startedAt = Number(params.get('start'));
-  const hasStart = Number.isFinite(startedAt) && startedAt > 0 && startedAt <= Date.now();
-
   // Computed once so the form's defaults do not shift while the user is typing.
-  const [initial] = useState(() => ({
-    type: type as 'walk' | 'home',
-    occurredAt: hasStart && type === 'walk' ? new Date(startedAt) : new Date(),
-    durationMin: hasStart && type === 'walk' ? Math.max(1, Math.round((Date.now() - startedAt) / 60_000)) : null,
-  }));
+  const [initial] = useState(() => {
+    const type = params.get('type') === 'home' ? 'home' : 'walk';
+    const startedAt = Number(params.get('start'));
+    const now = new Date().getTime();
+    const useStart =
+      type === 'walk' && Number.isFinite(startedAt) && startedAt > 0 && startedAt <= now;
+    return {
+      type: type as 'walk' | 'home',
+      occurredAt: useStart ? new Date(startedAt) : new Date(now),
+      durationMin: useStart ? Math.max(1, Math.round((now - startedAt) / 60_000)) : null,
+    };
+  });
 
   return (
     <>

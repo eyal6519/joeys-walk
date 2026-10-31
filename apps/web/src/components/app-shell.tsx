@@ -50,7 +50,8 @@ function BottomNav() {
     >
       <ul className="mx-auto flex max-w-2xl">
         {NAV.map((item) => {
-          const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+          const active =
+            item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
           return (
             <li key={item.href} className="flex-1">
               <Link
@@ -75,12 +76,23 @@ function BottomNav() {
 }
 
 /** Requires sign-in and an active household; renders the page inside the main layout. */
-export function AppShell({ children, hideNav = false }: { children: ReactNode; hideNav?: boolean }) {
+export function AppShell({
+  children,
+  hideNav = false,
+}: {
+  children: ReactNode;
+  hideNav?: boolean;
+}) {
   return (
     <SignedInOnly>
       <HouseholdProvider>
         <Gate>
-          <main className={cx('mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-8', hideNav ? 'pb-10' : 'pb-28')}>
+          <main
+            className={cx(
+              'mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-8',
+              hideNav ? 'pb-10' : 'pb-28',
+            )}
+          >
             {children}
           </main>
           {hideNav ? null : <BottomNav />}

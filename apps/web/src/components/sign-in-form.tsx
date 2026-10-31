@@ -11,8 +11,10 @@ import {
   getRememberedEmail,
   isEmailLinkUrl,
   sendEmailLink,
+  signInForLocalDemo,
   signInWithGoogle,
 } from '@/lib/firebase/auth';
+import { isEmulatorMode } from '@/lib/firebase/client';
 import { useAuth } from '@/providers/auth-provider';
 
 import { TextField } from './form';
@@ -20,7 +22,8 @@ import { Button, Card, ErrorNote, Spinner } from './ui';
 
 /** Only same-site relative paths are allowed as a post-login target (no open redirects). */
 export function safeNext(value: string | null): string {
-  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return '/';
+  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\'))
+    return '/';
   return value;
 }
 
@@ -34,24 +37,24 @@ export function SignInForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
-  const [finishing, setFinishing] = useState(false);
-  const [needsEmail, setNeedsEmail] = useState(false);
 
-  // Returning from the emailed link.
+  // Returning from the emailed link is detected once, during the first render, so
+  // the effect below never has to set state synchronously.
+  const [linkReturn] = useState(() => {
+    if (typeof window === 'undefined' || !isEmailLinkUrl(window.location.href))
+      return null;
+    return { href: window.location.href, remembered: getRememberedEmail() };
+  });
+  const [finishing, setFinishing] = useState(() => Boolean(linkReturn?.remembered));
+  const [needsEmail] = useState(() => Boolean(linkReturn && !linkReturn.remembered));
+
   useEffect(() => {
-    if (!isEmailLinkUrl(window.location.href)) return;
-    const remembered = getRememberedEmail();
-    if (!remembered) {
-      // Opened on a different device than the one that requested it.
-      setNeedsEmail(true);
-      return;
-    }
-    setFinishing(true);
-    completeEmailLinkSignIn(remembered, window.location.href).catch((e) => {
+    if (!linkReturn?.remembered) return;
+    completeEmailLinkSignIn(linkReturn.remembered, linkReturn.href).catch((e) => {
       setError(describeAuthError(e));
       setFinishing(false);
     });
-  }, []);
+  }, [linkReturn]);
 
   useEffect(() => {
     if (auth.status === 'signed-in') router.replace(next);
@@ -103,11 +106,28 @@ export function SignInForm() {
       </header>
 
       <Card className="flex flex-col gap-4">
-        <Button variant="secondary" disabled={busy} onClick={() => void run(signInWithGoogle)}>
+        <Button
+          variant="secondary"
+          disabled={busy}
+          onClick={() => void run(signInWithGoogle)}
+        >
           Continue with Google
         </Button>
 
-        <div className="flex items-center gap-3 text-xs text-ink-muted" aria-hidden="true">
+        {isEmulatorMode() && (
+          <Button
+            variant="ghost"
+            disabled={busy}
+            onClick={() => void run(signInForLocalDemo)}
+          >
+            Use a local test account
+          </Button>
+        )}
+
+        <div
+          className="flex items-center gap-3 text-xs text-ink-muted"
+          aria-hidden="true"
+        >
           <span className="h-px flex-1 bg-line" />
           or
           <span className="h-px flex-1 bg-line" />
@@ -115,8 +135,8 @@ export function SignInForm() {
 
         {sent ? (
           <p role="status" className="text-sm">
-            Check <strong>{email.trim()}</strong> for a sign-in link. You can close this tab; open the
-            link on this device.
+            Check <strong>{email.trim()}</strong> for a sign-in link. You can close this
+            tab; open the link on this device.
           </p>
         ) : (
           <form onSubmit={onSubmit} className="flex flex-col gap-3" noValidate>
@@ -128,7 +148,9 @@ export function SignInForm() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              hint={needsEmail ? undefined : 'We email you a link. No password to remember.'}
+              hint={
+                needsEmail ? undefined : 'We email you a link. No password to remember.'
+              }
             />
             <Button type="submit" disabled={busy}>
               {needsEmail ? 'Finish signing in' : 'Email me a sign-in link'}

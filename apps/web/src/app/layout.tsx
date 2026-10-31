@@ -13,6 +13,10 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/icon-180.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

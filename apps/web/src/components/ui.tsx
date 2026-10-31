@@ -37,9 +37,17 @@ export const inputClass =
   'placeholder:text-ink-muted focus-visible:outline-2 focus-visible:outline-offset-1 ' +
   'focus-visible:outline-brand-strong';
 
-export function Card({ children, className }: { children: ReactNode; className?: string }) {
+export function Card({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={cx('rounded-card border border-line bg-surface-raised p-4', className)}>
+    <div
+      className={cx('rounded-card border border-line bg-surface-raised p-4', className)}
+    >
       {children}
     </div>
   );
@@ -47,7 +55,10 @@ export function Card({ children, className }: { children: ReactNode; className?:
 
 export function Spinner({ label = 'Loading' }: { label?: string }) {
   return (
-    <div role="status" className="flex items-center justify-center gap-3 p-10 text-ink-muted">
+    <div
+      role="status"
+      className="flex items-center justify-center gap-3 p-10 text-ink-muted"
+    >
       <span
         aria-hidden="true"
         className="size-5 animate-spin rounded-full border-2 border-line border-t-brand-strong"
@@ -65,7 +76,15 @@ export function ErrorNote({ children }: { children: ReactNode }) {
   );
 }
 
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
+export function PageHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
   return (
     <header className="flex items-start justify-between gap-3">
       <div>
@@ -77,7 +96,15 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
   );
 }
 
-export function EmptyState({ title, hint, action }: { title: string; hint?: string; action?: ReactNode }) {
+export function EmptyState({
+  title,
+  hint,
+  action,
+}: {
+  title: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-line p-8 text-center">
       <span aria-hidden="true" className="text-3xl">

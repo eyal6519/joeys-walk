@@ -1,0 +1,49 @@
+name: Deploy
+
+# Manual, or on a version tag. To deploy on every push to main instead, add
+# `branches: [main]` under `push:` once both secrets below exist, otherwise the
+# job fails on every commit.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy to Firebase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # FIREBASE_WEB_CONFIG: the NEXT_PUBLIC_FIREBASE_* block for .env.local.
+      # FIREBASE_SERVICE_ACCOUNT: a service-account JSON key with Firebase Hosting
+      # Admin + Cloud Datastore/Firestore Rules permissions on the project.
+      - name: Write production env
+        run: printf '%s\n' "${{ secrets.FIREBASE_WEB_CONFIG }}" > apps/web/.env.local
+
+      - name: Verify env
+        run: npm run check:env
+
+      - name: Build
+        run: npm run build
+
+      - name: Authenticate to Google Cloud
+        run: |
+          printf '%s' "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+
+      # Hosting (static export from apps/web/out) plus the trust boundary: rules
+      # and indexes are versioned here and must ship with the client.
+      - name: Deploy
+        run: npx firebase deploy --project walklogger-c02fa --only hosting,firestore:rules,firestore:indexes

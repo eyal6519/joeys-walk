@@ -19,7 +19,9 @@ export function WalkTimerCard() {
       <Card className="flex flex-col gap-3">
         <div>
           <h2 className="font-semibold">Going for a walk?</h2>
-          <p className="text-sm text-ink-muted">Start the timer and log what happened when you are back.</p>
+          <p className="text-sm text-ink-muted">
+            Start the timer and log what happened when you are back.
+          </p>
         </div>
         <Button onClick={startWalkTimer}>🦮 Start walk</Button>
       </Card>
@@ -39,7 +41,10 @@ export function WalkTimerCard() {
         </p>
       </div>
       <div className="flex gap-3">
-        <Link href={`/log?type=walk&start=${startedAt}`} className={buttonClass('primary', 'flex-1')}>
+        <Link
+          href={`/log?type=walk&start=${startedAt}`}
+          className={buttonClass('primary', 'flex-1')}
+        >
           Finish &amp; log
         </Link>
         <Button

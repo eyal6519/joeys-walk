@@ -1,10 +1,13 @@
 import {
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   isSignInWithEmailLink,
   sendSignInLinkToEmail,
+  signInWithEmailAndPassword,
   signInWithEmailLink,
   signInWithPopup,
   signOut as firebaseSignOut,
+  updateProfile,
 } from 'firebase/auth';
 
 import { getFirebaseAuth } from './client';
@@ -33,13 +36,34 @@ export function getRememberedEmail(): string | null {
 }
 
 /** Completes link sign-in. Throws if the email is wrong or the link is expired or used. */
-export async function completeEmailLinkSignIn(email: string, href: string): Promise<void> {
+export async function completeEmailLinkSignIn(
+  email: string,
+  href: string,
+): Promise<void> {
   await signInWithEmailLink(getFirebaseAuth(), email, href);
   window.localStorage.removeItem(EMAIL_STORAGE_KEY);
 }
 
 export async function signOut(): Promise<void> {
   await firebaseSignOut(getFirebaseAuth());
+}
+
+/**
+ * Local development only: signs into the Auth emulator with a fixed demo
+ * account so the app is usable without Google sign-in or email. Never reached
+ * against production because the sign-in button that calls it is hidden unless
+ * `NEXT_PUBLIC_USE_EMULATORS=true`.
+ */
+export async function signInForLocalDemo(): Promise<void> {
+  const auth = getFirebaseAuth();
+  const email = 'demo@joey.local';
+  const password = 'joey-demo-password';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch {
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(credential.user, { displayName: 'Demo' });
+  }
 }
 
 /** Turns Firebase auth error codes into something a human can act on. */

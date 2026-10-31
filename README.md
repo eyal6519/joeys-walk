@@ -13,6 +13,44 @@ potty events, and a breakdown per caregiver.
 
 ---
 
+## Just want to use it? (no setup, no account)
+
+Everything runs on your own computer in "test mode" — nothing is sent anywhere and
+no Firebase account is needed.
+
+1. Open a terminal in this folder.
+2. First time only, run: `npm install`
+3. Then run: `npm start`
+4. When it says the app is ready, open **http://localhost:3000**
+5. On the sign-in screen, click **"Use a local test account"**.
+
+That's it. To stop, go back to the terminal and press **Ctrl+C**.
+
+Notes:
+
+- Test data lives only on this computer and is cleared every time you stop with
+  Ctrl+C, so it is safe to experiment.
+- To use it for real — on your phone, synced, and shared with family — see
+  **Publishing (for real use)** below, then use **Settings → Invite someone** to
+  add the other caregivers.
+
+### Publishing (for real use)
+
+The app is already published at **https://walklogger-c02fa.web.app**. After any
+code change, publish it with one command (requires `npx firebase login` once):
+
+```bash
+npm run deploy
+```
+
+This builds the app in production mode (talking to the real Firebase project, not
+the local test backend) and uploads the app, security rules, and indexes.
+
+Before sharing the link, make sure in the Firebase console that **Authentication →
+Sign-in method** has both **Google** and **Email link (passwordless)** turned on.
+
+---
+
 ## Stack
 
 | Layer | Choice |
@@ -21,7 +59,7 @@ potty events, and a breakdown per caregiver.
 | Styling | Tailwind CSS v4 |
 | Backend | Firebase Auth, Cloud Firestore, Cloud Storage, Security Rules |
 | Hosting | Firebase Hosting (static) |
-| PWA | Web manifest now, service worker in phase 6 |
+| PWA | Manifest + hand-written service worker (offline shell, install prompt) |
 | Tests | Vitest + Testing Library, Firebase Emulator Suite for rules |
 | Tooling | ESLint 10 (flat config), Prettier, GitHub Actions |
 
@@ -75,6 +113,7 @@ Run from the repository root.
 
 | Command | What it does |
 | --- | --- |
+| `npm start` | Run everything locally in test mode: emulators + app, one command (see above) |
 | `npm run dev` | Next dev server (`apps/web`) |
 | `npm run build` | Static export to `apps/web/out` |
 | `npm run lint` | ESLint |
@@ -91,13 +130,14 @@ Run from the repository root.
 
 ```
 apps/web/           Next.js PWA
-  src/app/          routes, layout, PWA manifest, global styles
-  src/components/   shared UI
-  src/features/     one folder per feature (logs, places, stats, household)
+  src/app/          routes (dashboard, log, history, stats, settings, ...), layout, manifest, styles
+  src/components/   shared UI (app shell, forms, charts, settings sections)
+  src/lib/data/     Firestore access (household, logs, places, refs)
   src/lib/firebase/ SDK initialisation and config mapping
-packages/shared/    Zod domain model + shared types (web, functions, rules tests)
-functions/          Cloud Functions v2 (phase 7)
-scripts/            repo tooling
+  src/providers/    auth, household and toast context
+  public/           service worker and generated PWA icons
+packages/shared/    Zod domain model + stats + types (web, functions, rules tests)
+scripts/            repo tooling (env check, icon generation)
 firestore.rules     Security Rules - the trust boundary
 firebase.json       Hosting, emulator and deployment configuration
 ```
@@ -122,11 +162,23 @@ firebase.json       Hosting, emulator and deployment configuration
 ## Roadmap
 
 - [x] **Phase 0** — monorepo, Next.js static export, Firebase wiring, CI
-- [ ] **Phase 1** — Auth, onboarding, Joey's profile, default places
-- [ ] **Phase 2** — Firestore rules + emulator test suite, shared domain model
-- [ ] **Phase 3** — walk and home-find logging, dashboard
-- [ ] **Phase 4** — history, filters, stats
-- [ ] **Phase 5** — places management, household invites
-- [ ] **Phase 6** — PWA install, offline shell, App Check, accessibility pass
+- [x] **Phase 1** — Auth, onboarding, Joey's profile, default places
+- [x] **Phase 2** — Firestore rules + emulator test suite, shared domain model
+- [x] **Phase 3** — walk and home-find logging, dashboard
+- [x] **Phase 4** — history, filters, stats
+- [x] **Phase 5** — places management, household invites
+- [x] **Phase 6** — PWA install, offline shell, icons, install prompt
+- [ ] **Phase 6b** — App Check (reCAPTCHA Enterprise), key restrictions, accessibility pass
 - [ ] **Phase 7** — Cloud Functions: digests and reminders
 - [ ] **Phase 8** — deploy pipeline, docs
+
+## PWA icons
+
+`apps/web/public/icons/*.png` are generated, not hand-drawn:
+
+```bash
+node scripts/generate-icons.mjs
+```
+
+It rasterises a paw print on the brand colour and encodes the PNGs with Node's
+zlib, so no image toolchain is required. Re-run it if the brand colour changes.

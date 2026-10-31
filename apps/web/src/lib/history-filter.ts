@@ -9,7 +9,11 @@ export type HistoryFilter = {
 
 export const DEFAULT_FILTER: HistoryFilter = { type: 'all', person: 'all', days: 30 };
 
-export function applyFilter(logs: readonly LogRecord[], filter: HistoryFilter, now: Date): LogRecord[] {
+export function applyFilter(
+  logs: readonly LogRecord[],
+  filter: HistoryFilter,
+  now: Date,
+): LogRecord[] {
   const cutoff = filter.days === 0 ? null : now.getTime() - filter.days * 86_400_000;
   return logs.filter((log) => {
     if (filter.type !== 'all' && log.type !== filter.type) return false;

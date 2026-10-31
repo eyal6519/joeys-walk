@@ -1,6 +1,15 @@
 'use client';
 
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 import type { DayBucket } from '@walklogger/shared';
 
@@ -11,7 +20,11 @@ const PEE = 'var(--color-brand)';
 const POOP = '#8b6a4f';
 
 export function DailyPottyChart({ buckets }: { buckets: DayBucket[] }) {
-  const data = buckets.map((b) => ({ day: formatShortDate(b.date), Pee: b.pee, Poop: b.poop }));
+  const data = buckets.map((b) => ({
+    day: formatShortDate(b.date),
+    Pee: b.pee,
+    Poop: b.poop,
+  }));
   const total = buckets.reduce((sum, b) => sum + b.pee + b.poop, 0);
 
   return (
@@ -22,9 +35,20 @@ export function DailyPottyChart({ buckets }: { buckets: DayBucket[] }) {
       <div className="h-56 w-full" aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" vertical={false} />
-            <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'var(--color-ink-muted)' }} interval="preserveStartEnd" />
-            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: 'var(--color-ink-muted)' }} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--color-line)"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="day"
+              tick={{ fontSize: 11, fill: 'var(--color-ink-muted)' }}
+              interval="preserveStartEnd"
+            />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fontSize: 11, fill: 'var(--color-ink-muted)' }}
+            />
             <Tooltip
               contentStyle={{
                 background: 'var(--color-surface-raised)',

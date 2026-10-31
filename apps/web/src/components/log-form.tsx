@@ -2,7 +2,13 @@
 
 import { useState, type FormEvent } from 'react';
 
-import { flagsToPotty, type LogInput, type LogRecord, type LogType, type Potty } from '@walklogger/shared';
+import {
+  flagsToPotty,
+  type LogInput,
+  type LogRecord,
+  type LogType,
+  type Potty,
+} from '@walklogger/shared';
 
 import { buildLogInput, OTHER } from '@/lib/log-form-model';
 import { fromLocalInputValue, toLocalInputValue } from '@/lib/utils/datetime';
@@ -42,13 +48,25 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
 
   const [type, setType] = useState<LogType>(initial.type);
   const [when, setWhen] = useState(toLocalInputValue(initial.occurredAt));
-  const [potty, setPotty] = useState<Potty | null>(existing ? flagsToPotty(existing.pee, existing.poop) : null);
-  const [duration, setDuration] = useState(initial.durationMin === null ? '' : String(initial.durationMin));
+  const [potty, setPotty] = useState<Potty | null>(
+    existing ? flagsToPotty(existing.pee, existing.poop) : null,
+  );
+  const [duration, setDuration] = useState(
+    initial.durationMin === null ? '' : String(initial.durationMin),
+  );
   const [note, setNote] = useState(existing?.note ?? '');
-  const [walker, setWalker] = useState<string>(existing ? (existing.walkerUid ?? OTHER) : actor.uid);
-  const [walkerOther, setWalkerOther] = useState(existing && !existing.walkerUid ? (existing.walkerName ?? '') : '');
-  const [place, setPlace] = useState<string>(existing ? (existing.placeId ?? OTHER) : (selectable[0]?.id ?? OTHER));
-  const [placeOther, setPlaceOther] = useState(existing && !existing.placeId ? (existing.placeLabel ?? '') : '');
+  const [walker, setWalker] = useState<string>(
+    existing ? (existing.walkerUid ?? OTHER) : actor.uid,
+  );
+  const [walkerOther, setWalkerOther] = useState(
+    existing && !existing.walkerUid ? (existing.walkerName ?? '') : '',
+  );
+  const [place, setPlace] = useState<string>(
+    existing ? (existing.placeId ?? OTHER) : (selectable[0]?.id ?? OTHER),
+  );
+  const [placeOther, setPlaceOther] = useState(
+    existing && !existing.placeId ? (existing.placeLabel ?? '') : '',
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const walkerOptions: Option<string>[] = [
@@ -59,7 +77,11 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
     { value: OTHER, label: 'Someone else' },
   ];
   const placeOptions: Option<string>[] = [
-    ...selectable.map((p) => ({ value: p.id, label: p.label, icon: p.icon ?? undefined })),
+    ...selectable.map((p) => ({
+      value: p.id,
+      label: p.label,
+      icon: p.icon ?? undefined,
+    })),
     { value: OTHER, label: 'Somewhere else', icon: '✏️' },
   ];
 
@@ -71,7 +93,17 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    const values = { type, when: fromLocalInputValue(when), potty, note, walker, walkerOther, duration, place, placeOther };
+    const values = {
+      type,
+      when: fromLocalInputValue(when),
+      potty,
+      note,
+      walker,
+      walkerOther,
+      duration,
+      place,
+      placeOther,
+    };
     const result = buildLogInput(values, members, places);
     if (!result.ok) {
       setErrors(result.errors);
@@ -96,7 +128,13 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
 
       {type === 'walk' ? (
         <>
-          <ChoiceGroup legend="Who took him?" name="walker" value={walker} onChange={setWalker} options={walkerOptions} />
+          <ChoiceGroup
+            legend="Who took him?"
+            name="walker"
+            value={walker}
+            onChange={setWalker}
+            options={walkerOptions}
+          />
           {walker === OTHER && (
             <TextField
               label="Their name"
@@ -121,7 +159,13 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
         </>
       ) : (
         <>
-          <ChoiceGroup legend="Where?" name="place" value={place} onChange={setPlace} options={placeOptions} />
+          <ChoiceGroup
+            legend="Where?"
+            name="place"
+            value={place}
+            onChange={setPlace}
+            options={placeOptions}
+          />
           {place === OTHER && (
             <TextField
               label="Where exactly?"
@@ -144,7 +188,13 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
         error={errors.occurredAt}
       />
 
-      <TextArea label="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} error={errors.note} maxLength={500} />
+      <TextArea
+        label="Note (optional)"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        error={errors.note}
+        maxLength={500}
+      />
 
       {errors.form ? <ErrorNote>{errors.form}</ErrorNote> : null}
 

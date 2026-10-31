@@ -11,6 +11,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "start": "node scripts/run-local.mjs",
     "dev": "npm run dev --workspace @walklogger/web",
     "build": "npm run build --workspace @walklogger/web",
     "lint": "npm run lint --workspace @walklogger/web",
@@ -20,8 +21,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "emulators": "firebase emulators:start",
+    "deploy": "npm run build && firebase deploy --only hosting,firestore:rules,firestore:indexes",
     "deploy:hosting": "npm run build && firebase deploy --only hosting",
-    "deploy:rules": "firebase deploy --only firestore:rules,firestore:indexes,storage",
+    "deploy:rules": "firebase deploy --only firestore:rules,firestore:indexes",
     "test:rules": "firebase emulators:exec --only firestore --project walklogger-c02fa \"vitest run --root tests/rules\""
   },
   "devDependencies": {

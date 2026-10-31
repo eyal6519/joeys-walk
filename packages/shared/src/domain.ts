@@ -104,7 +104,11 @@ export type LogRecord = {
 };
 
 export const placeInputSchema = z.object({
-  label: z.string().trim().min(1, 'Give the place a name').max(40, 'Keep it under 40 characters'),
+  label: z
+    .string()
+    .trim()
+    .min(1, 'Give the place a name')
+    .max(40, 'Keep it under 40 characters'),
   icon: z.string().trim().max(8).nullable(),
 });
 export type PlaceInput = z.infer<typeof placeInputSchema>;

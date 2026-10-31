@@ -1,4 +1,8 @@
-import { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
+import {
+  assertFails,
+  assertSucceeds,
+  type RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import {
   collection,
   deleteDoc,
@@ -50,9 +54,15 @@ describe('household access', () => {
   });
 
   it('only lets the owner edit the dog profile, and never ownerUid', async () => {
-    await assertSucceeds(updateDoc(doc(db(OWNER), `households/${HID}`), { dogName: 'Joey Jr' }));
-    await assertFails(updateDoc(doc(db(MEMBER), `households/${HID}`), { dogName: 'Hax' }));
-    await assertFails(updateDoc(doc(db(OWNER), `households/${HID}`), { ownerUid: MEMBER }));
+    await assertSucceeds(
+      updateDoc(doc(db(OWNER), `households/${HID}`), { dogName: 'Joey Jr' }),
+    );
+    await assertFails(
+      updateDoc(doc(db(MEMBER), `households/${HID}`), { dogName: 'Hax' }),
+    );
+    await assertFails(
+      updateDoc(doc(db(OWNER), `households/${HID}`), { ownerUid: MEMBER }),
+    );
   });
 
   it('never allows deleting a household', async () => {
@@ -76,6 +86,42 @@ describe('household creation', () => {
       displayName: 'Newbie',
       role: 'owner',
       joinedAt: serverTimestamp(),
+    });
+    await assertSucceeds(batch.commit());
+  });
+
+  it('lets a user found a household with default places and profile pointer in one batch', async () => {
+    const user = db('founder');
+    const batch = writeBatch(user);
+    batch.set(doc(user, 'households/new3'), {
+      name: 'Mine',
+      ownerUid: 'founder',
+      dogName: 'Joey',
+      dogBreed: null,
+      dogBirthDate: null,
+      createdAt: serverTimestamp(),
+    });
+    batch.set(doc(user, 'households/new3/members/founder'), {
+      displayName: 'Founder',
+      role: 'owner',
+      joinedAt: serverTimestamp(),
+    });
+    batch.set(doc(collection(user, 'households/new3/places')), {
+      label: 'Kitchen',
+      icon: '🍳',
+      order: 0,
+      archived: false,
+    });
+    batch.set(doc(collection(user, 'households/new3/places')), {
+      label: 'Balcony',
+      icon: '🌿',
+      order: 1,
+      archived: false,
+    });
+    batch.set(doc(user, 'users/founder'), {
+      householdId: 'new3',
+      displayName: 'Founder',
+      updatedAt: serverTimestamp(),
     });
     await assertSucceeds(batch.commit());
   });
@@ -114,11 +160,15 @@ describe('members', () => {
   it('lets members leave, but the owner cannot be removed or leave', async () => {
     await assertFails(deleteDoc(doc(db(OWNER), `households/${HID}/members/${OWNER}`)));
     await assertFails(deleteDoc(doc(db(MEMBER), `households/${HID}/members/${OWNER}`)));
-    await assertSucceeds(deleteDoc(doc(db(MEMBER), `households/${HID}/members/${MEMBER}`)));
+    await assertSucceeds(
+      deleteDoc(doc(db(MEMBER), `households/${HID}/members/${MEMBER}`)),
+    );
   });
 
   it('lets the owner remove another member', async () => {
-    await assertSucceeds(deleteDoc(doc(db(OWNER), `households/${HID}/members/${MEMBER}`)));
+    await assertSucceeds(
+      deleteDoc(doc(db(OWNER), `households/${HID}/members/${MEMBER}`)),
+    );
   });
 });
 
@@ -128,8 +178,12 @@ describe('places', () => {
   it('lets members manage valid places and strangers not', async () => {
     await assertSucceeds(setDoc(doc(db(MEMBER), `households/${HID}/places/p1`), place));
     await assertFails(setDoc(doc(db(STRANGER), `households/${HID}/places/p2`), place));
-    await assertFails(setDoc(doc(db(MEMBER), `households/${HID}/places/p3`), { ...place, label: '' }));
-    await assertFails(setDoc(doc(db(MEMBER), `households/${HID}/places/p4`), { ...place, evil: true }));
+    await assertFails(
+      setDoc(doc(db(MEMBER), `households/${HID}/places/p3`), { ...place, label: '' }),
+    );
+    await assertFails(
+      setDoc(doc(db(MEMBER), `households/${HID}/places/p4`), { ...place, evil: true }),
+    );
   });
 });
 

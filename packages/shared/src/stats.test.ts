@@ -11,7 +11,8 @@ import {
   type StatLog,
 } from './stats';
 
-const at = (y: number, m: number, d: number, h = 12, min = 0) => new Date(y, m - 1, d, h, min);
+const at = (y: number, m: number, d: number, h = 12, min = 0) =>
+  new Date(y, m - 1, d, h, min);
 
 function log(partial: Partial<StatLog> & { occurredAt: Date }): StatLog {
   return {
@@ -41,7 +42,10 @@ describe('dailyBuckets', () => {
   it('returns one bucket per day including empty ones, oldest first', () => {
     const now = at(2026, 3, 10);
     const buckets = dailyBuckets(
-      [log({ occurredAt: at(2026, 3, 10, 8), pee: true }), log({ occurredAt: at(2026, 3, 8), poop: true })],
+      [
+        log({ occurredAt: at(2026, 3, 10, 8), pee: true }),
+        log({ occurredAt: at(2026, 3, 8), poop: true }),
+      ],
       3,
       now,
     );
@@ -54,7 +58,11 @@ describe('dailyBuckets', () => {
   });
 
   it('ignores logs outside the window', () => {
-    const buckets = dailyBuckets([log({ occurredAt: at(2026, 1, 1), pee: true })], 3, at(2026, 3, 10));
+    const buckets = dailyBuckets(
+      [log({ occurredAt: at(2026, 1, 1), pee: true })],
+      3,
+      at(2026, 3, 10),
+    );
     expect(buckets.every((b) => b.pee === 0)).toBe(true);
   });
 
@@ -98,9 +106,24 @@ describe('lastPottyAt', () => {
 describe('walkerBreakdown', () => {
   it('groups by account when present and by name otherwise, sorted by walks', () => {
     const result = walkerBreakdown([
-      log({ occurredAt: at(2026, 1, 1), walkerUid: 'u1', walkerName: 'Eyal', durationMin: 20 }),
-      log({ occurredAt: at(2026, 1, 2), walkerUid: 'u1', walkerName: 'Eyal', durationMin: 30 }),
-      log({ occurredAt: at(2026, 1, 3), walkerUid: null, walkerName: 'Dana', durationMin: 15 }),
+      log({
+        occurredAt: at(2026, 1, 1),
+        walkerUid: 'u1',
+        walkerName: 'Eyal',
+        durationMin: 20,
+      }),
+      log({
+        occurredAt: at(2026, 1, 2),
+        walkerUid: 'u1',
+        walkerName: 'Eyal',
+        durationMin: 30,
+      }),
+      log({
+        occurredAt: at(2026, 1, 3),
+        walkerUid: null,
+        walkerName: 'Dana',
+        durationMin: 15,
+      }),
       log({ occurredAt: at(2026, 1, 4), walkerUid: null, walkerName: 'dana' }),
       log({ occurredAt: at(2026, 1, 5), type: 'home', pee: true }),
     ]);
@@ -116,7 +139,12 @@ describe('placeBreakdown', () => {
     const result = placeBreakdown([
       log({ occurredAt: at(2026, 1, 1), type: 'home', pee: true, placeLabel: 'Kitchen' }),
       log({ occurredAt: at(2026, 1, 2), type: 'home', pee: true, placeLabel: 'kitchen' }),
-      log({ occurredAt: at(2026, 1, 3), type: 'home', poop: true, placeLabel: 'Bedroom' }),
+      log({
+        occurredAt: at(2026, 1, 3),
+        type: 'home',
+        poop: true,
+        placeLabel: 'Bedroom',
+      }),
       log({ occurredAt: at(2026, 1, 4), pee: true }),
     ]);
     expect(result).toEqual([

@@ -38,7 +38,9 @@ export function LogItem({ log }: { log: LogRecord }) {
             {pottyIcon(log)} {describePotty(log)}
           </span>
           <span className="truncate text-sm text-ink-muted">{where}</span>
-          {log.note ? <span className="truncate text-xs text-ink-muted">“{log.note}”</span> : null}
+          {log.note ? (
+            <span className="truncate text-xs text-ink-muted">“{log.note}”</span>
+          ) : null}
         </span>
         <time dateTime={log.occurredAt.toISOString()} className="text-sm text-ink-muted">
           {formatTime(log.occurredAt)}

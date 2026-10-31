@@ -1,10 +1,22 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 import type { Household, LogRecord, Member, Place } from '@walklogger/shared';
 
-import { clearActiveHousehold, watchActiveHousehold, watchHousehold, watchMembers } from '@/lib/data/household';
+import {
+  clearActiveHousehold,
+  watchActiveHousehold,
+  watchHousehold,
+  watchMembers,
+} from '@/lib/data/household';
 import { watchLogs } from '@/lib/data/logs';
 import { watchPlaces } from '@/lib/data/places';
 import type { Actor } from '@/lib/data/refs';
@@ -35,7 +47,8 @@ export function useHouseholdState(): HouseholdState {
 /** For screens that only render once a household is loaded. */
 export function useHousehold(): HouseholdData {
   const state = useContext(HouseholdContext);
-  if (state.status !== 'ready') throw new Error('useHousehold called before the household is ready');
+  if (state.status !== 'ready')
+    throw new Error('useHousehold called before the household is ready');
   return state;
 }
 
@@ -50,7 +63,10 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
   const auth = useSignedIn();
   const [pointer, setPointer] = useState<string | null | undefined>(undefined);
   const [error, setError] = useState<Error | null>(null);
-  const actor = useMemo<Actor>(() => ({ uid: auth.user.uid, name: auth.name }), [auth.user.uid, auth.name]);
+  const actor = useMemo<Actor>(
+    () => ({ uid: auth.user.uid, name: auth.name }),
+    [auth.user.uid, auth.name],
+  );
 
   useEffect(() => watchActiveHousehold(actor.uid, setPointer, setError), [actor.uid]);
 
@@ -61,16 +77,26 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
 
   if (error) {
     return (
-      <HouseholdContext.Provider value={{ status: 'error', message: describe(error), reset }}>
+      <HouseholdContext.Provider
+        value={{ status: 'error', message: describe(error), reset }}
+      >
         {children}
       </HouseholdContext.Provider>
     );
   }
   if (pointer === undefined) {
-    return <HouseholdContext.Provider value={{ status: 'loading' }}>{children}</HouseholdContext.Provider>;
+    return (
+      <HouseholdContext.Provider value={{ status: 'loading' }}>
+        {children}
+      </HouseholdContext.Provider>
+    );
   }
   if (pointer === null) {
-    return <HouseholdContext.Provider value={{ status: 'none' }}>{children}</HouseholdContext.Provider>;
+    return (
+      <HouseholdContext.Provider value={{ status: 'none' }}>
+        {children}
+      </HouseholdContext.Provider>
+    );
   }
   return (
     <HouseholdData key={pointer} hid={pointer} actor={actor} reset={reset}>

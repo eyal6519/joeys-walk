@@ -22,7 +22,9 @@ function EditLog() {
       <EmptyState
         title="Entry not found"
         hint="It may have been deleted, or it is older than the history we keep loaded."
-        action={<Button onClick={() => router.replace('/history')}>Back to history</Button>}
+        action={
+          <Button onClick={() => router.replace('/history')}>Back to history</Button>
+        }
       />
     );
   }
@@ -32,7 +34,12 @@ function EditLog() {
     <>
       <PageHeader title="Edit entry" subtitle={`Logged by ${log.createdByName}`} />
       <LogForm
-        initial={{ type: log.type, occurredAt: log.occurredAt, durationMin: log.durationMin, existing: log }}
+        initial={{
+          type: log.type,
+          occurredAt: log.occurredAt,
+          durationMin: log.durationMin,
+          existing: log,
+        }}
         submitLabel="Save changes"
         onCancel={() => router.back()}
         onSubmit={(input) => {

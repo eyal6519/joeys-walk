@@ -4,7 +4,10 @@ export function formatSpan(ms: number): string {
   if (totalMin < 60) return `${totalMin} min`;
   const hours = Math.floor(totalMin / 60);
   const minutes = totalMin % 60;
-  if (hours < 24) return minutes === 0 ? `${hours} h` : `${hours} h ${String(minutes).padStart(2, '0')} min`;
+  if (hours < 24)
+    return minutes === 0
+      ? `${hours} h`
+      : `${hours} h ${String(minutes).padStart(2, '0')} min`;
   const days = Math.floor(hours / 24);
   const remHours = hours % 24;
   return remHours === 0 ? `${days} d` : `${days} d ${remHours} h`;

@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 type Toast = { id: number; message: string; tone: 'info' | 'error' };
 type Notify = (message: string, tone?: Toast['tone']) => void;
@@ -21,7 +28,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const notify = useCallback<Notify>((message, tone = 'info') => {
     const id = Date.now() + Math.random();
     setToasts((current) => [...current, { id, message, tone }]);
-    setTimeout(() => setToasts((current) => current.filter((t) => t.id !== id)), tone === 'error' ? 7000 : 3500);
+    setTimeout(
+      () => setToasts((current) => current.filter((t) => t.id !== id)),
+      tone === 'error' ? 7000 : 3500,
+    );
   }, []);
 
   const value = useMemo(() => notify, [notify]);

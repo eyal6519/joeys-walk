@@ -29,7 +29,10 @@ function Dashboard() {
 
       <section aria-labelledby="today-heading" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 id="today-heading" className="text-sm font-semibold uppercase tracking-wide">
+          <h2
+            id="today-heading"
+            className="text-sm font-semibold uppercase tracking-wide"
+          >
             Today
           </h2>
           <Link href="/log" className="text-sm font-medium text-brand-strong underline">
@@ -37,7 +40,10 @@ function Dashboard() {
           </Link>
         </div>
         {today.length === 0 ? (
-          <EmptyState title="Nothing logged today" hint="Start a walk or log something you found." />
+          <EmptyState
+            title="Nothing logged today"
+            hint="Start a walk or log something you found."
+          />
         ) : (
           <ul className="flex flex-col gap-2">
             {today.map((log) => (

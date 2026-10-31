@@ -24,8 +24,7 @@ export type LogFormValues = {
 };
 
 export type BuildResult =
-  | { ok: true; input: LogInput }
-  | { ok: false; errors: Record<string, string> };
+  { ok: true; input: LogInput } | { ok: false; errors: Record<string, string> };
 
 /**
  * Turns raw form state into a validated LogInput, or per-field error messages.
@@ -64,7 +63,8 @@ export function buildLogInput(
   }
 
   const errors: Record<string, string> = {};
-  if (!values.potty) errors.potty = values.type === 'walk' ? 'What did Joey do?' : 'What was found?';
+  if (!values.potty)
+    errors.potty = values.type === 'walk' ? 'What did Joey do?' : 'What was found?';
 
   const parsed = logInputSchema.safeParse(candidate);
   if (!parsed.success) {

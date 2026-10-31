@@ -51,7 +51,10 @@ export function createLog(hid: string, actor: Actor, raw: LogInput): Promise<voi
 
 export function updateLog(hid: string, id: string, raw: LogInput): Promise<void> {
   const input = logInputSchema.parse(raw);
-  return updateDoc(doc(logsCol(hid), id), { ...logPayload(input), updatedAt: serverTimestamp() });
+  return updateDoc(doc(logsCol(hid), id), {
+    ...logPayload(input),
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export function deleteLog(hid: string, id: string): Promise<void> {

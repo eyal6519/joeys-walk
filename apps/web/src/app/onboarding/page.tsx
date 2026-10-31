@@ -31,7 +31,11 @@ function Onboarding() {
       />
       <Card>
         <HouseholdForm
-          initial={{ dogName: 'Joey', dogBreed: 'Toy Poodle', name: `${auth.name}’s home` }}
+          initial={{
+            dogName: 'Joey',
+            dogBreed: 'Toy Poodle',
+            name: `${auth.name}’s home`,
+          }}
           submitLabel="Create household"
           onSubmit={async (input) => {
             await createHousehold({ uid: auth.user.uid, name: auth.name }, input);

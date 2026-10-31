@@ -1,4 +1,8 @@
-import { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
+import {
+  assertFails,
+  assertSucceeds,
+  type RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import {
   collection,
   deleteDoc,
@@ -10,7 +14,16 @@ import {
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
-import { createEnv, HID, homeLog, MEMBER, OWNER, seed, STRANGER, walkLog } from './helpers';
+import {
+  createEnv,
+  HID,
+  homeLog,
+  MEMBER,
+  OWNER,
+  seed,
+  STRANGER,
+  walkLog,
+} from './helpers';
 
 let env: RulesTestEnvironment;
 
@@ -31,11 +44,17 @@ describe('creating logs', () => {
   it('accepts valid walk and home logs from a member', async () => {
     await assertSucceeds(setDoc(doc(logs(MEMBER)), walkLog(MEMBER)));
     await assertSucceeds(
-      setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { pee: false, poop: false, durationMin: null })),
+      setDoc(
+        doc(logs(MEMBER)),
+        walkLog(MEMBER, { pee: false, poop: false, durationMin: null }),
+      ),
     );
     await assertSucceeds(setDoc(doc(logs(MEMBER)), homeLog(MEMBER)));
     await assertSucceeds(
-      setDoc(doc(logs(MEMBER)), homeLog(MEMBER, { placeId: null, placeLabel: 'Under the sofa' })),
+      setDoc(
+        doc(logs(MEMBER)),
+        homeLog(MEMBER, { placeId: null, placeLabel: 'Under the sofa' }),
+      ),
     );
   });
 
@@ -51,11 +70,15 @@ describe('creating logs', () => {
   });
 
   it('rejects a home log where nothing was found', async () => {
-    await assertFails(setDoc(doc(logs(MEMBER)), homeLog(MEMBER, { pee: false, poop: false })));
+    await assertFails(
+      setDoc(doc(logs(MEMBER)), homeLog(MEMBER, { pee: false, poop: false })),
+    );
   });
 
   it('rejects mixing walk and home fields', async () => {
-    await assertFails(setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { placeLabel: 'Kitchen' })));
+    await assertFails(
+      setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { placeLabel: 'Kitchen' })),
+    );
     await assertFails(setDoc(doc(logs(MEMBER)), homeLog(MEMBER, { walkerName: 'X' })));
   });
 
@@ -64,7 +87,9 @@ describe('creating logs', () => {
     await assertFails(setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { pee: 'yes' })));
     await assertFails(setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { durationMin: 5000 })));
     await assertFails(setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { type: 'swim' })));
-    await assertFails(setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { note: 'x'.repeat(501) })));
+    await assertFails(
+      setDoc(doc(logs(MEMBER)), walkLog(MEMBER, { note: 'x'.repeat(501) })),
+    );
   });
 
   it('rejects logs dated well into the future', async () => {
@@ -76,11 +101,18 @@ describe('creating logs', () => {
 describe('editing and deleting logs', () => {
   it('lets a member correct a log but not change author, type or creation time', async () => {
     const ref = doc(db(MEMBER), `households/${HID}/logs/existing`);
-    await assertSucceeds(updateDoc(ref, { durationMin: 45, updatedAt: serverTimestamp() }));
-    await assertFails(updateDoc(ref, { createdBy: MEMBER, updatedAt: serverTimestamp() }));
+    await assertSucceeds(
+      updateDoc(ref, { durationMin: 45, updatedAt: serverTimestamp() }),
+    );
+    await assertFails(
+      updateDoc(ref, { createdBy: MEMBER, updatedAt: serverTimestamp() }),
+    );
     await assertFails(updateDoc(ref, { type: 'home', updatedAt: serverTimestamp() }));
     await assertFails(
-      updateDoc(ref, { createdAt: Timestamp.fromMillis(0), updatedAt: serverTimestamp() }),
+      updateDoc(ref, {
+        createdAt: Timestamp.fromMillis(0),
+        updatedAt: serverTimestamp(),
+      }),
     );
     await assertFails(updateDoc(ref, { durationMin: 46 }));
   });
