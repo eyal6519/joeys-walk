@@ -1,72 +1,59 @@
-import { siteConfig } from '@walklogger/shared';
+'use client';
 
-import { BackendStatus } from '@/components/backend-status';
+import Link from 'next/link';
 
-const ROADMAP = [
-  {
-    phase: 'Phase 1',
-    title: 'Sign in & Joey\u2019s profile',
-    detail:
-      'Google or emailed magic link, then name the household and seed the default places.',
-  },
-  {
-    phase: 'Phase 2',
-    title: 'Security rules & domain model',
-    detail: 'Household-scoped Firestore rules, validated against the emulator suite.',
-  },
-  {
-    phase: 'Phase 3',
-    title: 'Log a walk or a find',
-    detail: 'Walk timer, who took him, pee/poop/both/neither, and home places as chips.',
-  },
-  {
-    phase: 'Phase 4',
-    title: 'History & stats',
-    detail: 'Filterable timeline plus per-day counts, what your vet actually asks about.',
-  },
-] as const;
+import { startOfDay } from '@walklogger/shared';
+
+import { AppShell } from '@/components/app-shell';
+import { LogItem } from '@/components/log-item';
+import { TodaySummary } from '@/components/today-summary';
+import { buttonClass, EmptyState, PageHeader } from '@/components/ui';
+import { WalkTimerCard } from '@/components/walk-timer-card';
+import { useNow } from '@/lib/hooks/use-now';
+import { useHousehold } from '@/providers/household-provider';
+
+function Dashboard() {
+  const { household, logs } = useHousehold();
+  const now = useNow(30_000);
+  const start = startOfDay(now);
+  const today = logs.filter((log) => log.occurredAt >= start);
+
+  return (
+    <>
+      <PageHeader title={`${household.dogName}'s day 🐩`} subtitle={household.name} />
+      <TodaySummary logs={logs} now={now} dogName={household.dogName} />
+      <WalkTimerCard />
+      <Link href="/log?type=home" className={buttonClass('secondary')}>
+        🏠 Found something at home
+      </Link>
+
+      <section aria-labelledby="today-heading" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 id="today-heading" className="text-sm font-semibold uppercase tracking-wide">
+            Today
+          </h2>
+          <Link href="/log" className="text-sm font-medium text-brand-strong underline">
+            Add entry
+          </Link>
+        </div>
+        {today.length === 0 ? (
+          <EmptyState title="Nothing logged today" hint="Start a walk or log something you found." />
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {today.map((log) => (
+              <LogItem key={log.id} log={log} />
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
+  );
+}
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-8 px-5 py-10">
-      <header className="flex flex-col gap-2">
-        <span className="text-brand text-4xl" aria-hidden="true">
-          🐩
-        </span>
-        <h1 className="text-3xl font-semibold tracking-tight">{siteConfig.name}</h1>
-        <p className="text-ink-muted">{siteConfig.tagline}</p>
-        <p className="text-ink-muted text-sm">{siteConfig.description}</p>
-      </header>
-
-      <BackendStatus />
-
-      <section aria-labelledby="roadmap-heading" className="flex flex-col gap-3">
-        <h2
-          id="roadmap-heading"
-          className="text-sm font-semibold tracking-wide uppercase"
-        >
-          What is coming next
-        </h2>
-        <ol className="flex flex-col gap-3">
-          {ROADMAP.map((item) => (
-            <li
-              key={item.phase}
-              className="rounded-card border-line bg-surface-raised flex flex-col gap-1 border p-4"
-            >
-              <span className="text-brand-strong text-xs font-semibold">
-                {item.phase}
-              </span>
-              <span className="font-medium">{item.title}</span>
-              <span className="text-ink-muted text-sm">{item.detail}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <footer className="text-ink-muted mt-auto text-xs">
-        Scaffold complete: Next.js static export, Firebase, Tailwind and Vitest are wired
-        up.
-      </footer>
-    </main>
+    <AppShell>
+      <Dashboard />
+    </AppShell>
   );
 }
