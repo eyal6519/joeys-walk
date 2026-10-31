@@ -9,15 +9,15 @@
  * dark-mode override below stays a pure CSS concern.
  */
 @theme {
-  --color-surface: #fff7f2;
+  --color-surface: #fdf8f3;
   --color-surface-raised: #ffffff;
-  --color-ink: #2c2230;
-  --color-ink-muted: #7a6b80;
-  --color-brand: #e8749b;
-  --color-brand-strong: #c24470;
+  --color-ink: #33291f;
+  --color-ink-muted: #8a7a68;
+  --color-brand: #a9713f;
+  --color-brand-strong: #7f4f24;
   --color-on-brand: #ffffff;
-  --color-brand-soft: #fde8ef;
-  --color-line: #f0dfe4;
+  --color-brand-soft: #f5e9da;
+  --color-line: #ece0d0;
   --color-success: #4f9d69;
   --color-danger: #c8503f;
 
@@ -34,15 +34,15 @@
  */
 @media (prefers-color-scheme: dark) {
   @theme {
-    --color-surface: #17121a;
-    --color-surface-raised: #221a26;
-    --color-ink: #f4eef6;
-    --color-ink-muted: #a99cae;
-    --color-brand: #f08bb0;
-    --color-brand-strong: #f6a9c4;
-    --color-on-brand: #2a1420;
-    --color-brand-soft: #2e1f27;
-    --color-line: #372b3c;
+    --color-surface: #1a1512;
+    --color-surface-raised: #241d17;
+    --color-ink: #f4ece3;
+    --color-ink-muted: #b0a292;
+    --color-brand: #c8935a;
+    --color-brand-strong: #d9a86e;
+    --color-on-brand: #2a1e12;
+    --color-brand-soft: #2e2418;
+    --color-line: #3a2f24;
   }
 }
 

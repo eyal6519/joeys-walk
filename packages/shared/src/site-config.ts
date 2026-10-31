@@ -12,8 +12,8 @@ export const siteConfig = {
     'Track Joey the toy poodle: walks, who took him, and every potty break in between.',
   dogName: 'Joey',
   dogBreed: 'Toy Poodle',
-  themeColor: '#e8749b',
-  backgroundColor: '#fff7f2',
+  themeColor: '#a9713f',
+  backgroundColor: '#fdf8f3',
   locale: 'en',
   startUrl: '/',
 } as const;

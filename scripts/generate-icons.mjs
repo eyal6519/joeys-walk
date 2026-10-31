@@ -11,7 +11,7 @@ import { deflateSync } from 'node:zlib';
  * Run with `node scripts/generate-icons.mjs`; output goes to apps/web/public/icons.
  */
 
-const BRAND = [232, 116, 155]; // --color-brand #e8749b
+const BRAND = [169, 113, 63]; // --color-brand #a9713f
 const PAW = [255, 255, 255];
 
 // Geometry in 512-space, scaled to each icon size.
