@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react';
 
@@ -20,6 +21,8 @@ import {
 import { watchLogs } from '@/lib/data/logs';
 import { watchPlaces } from '@/lib/data/places';
 import type { Actor } from '@/lib/data/refs';
+import { isPreview } from '@/lib/preview';
+import { usePreviewSnapshot } from '@/lib/preview/store';
 
 import { useSignedIn } from './auth-provider';
 
@@ -58,8 +61,44 @@ function describe(error: Error): string {
     : error.message;
 }
 
-/** Watches which household is active for this user, then mounts its data subscriptions. */
+/** Serves the live Firestore household, or the in-memory preview store in dev preview mode. */
 export function HouseholdProvider({ children }: { children: ReactNode }) {
+  if (isPreview()) return <PreviewHouseholdProvider>{children}</PreviewHouseholdProvider>;
+  return <WatchedHouseholdProvider>{children}</WatchedHouseholdProvider>;
+}
+
+function PreviewHouseholdProvider({ children }: { children: ReactNode }) {
+  // Client-only gate: the real provider is also `loading` on first paint, and
+  // the seeded data is time-relative, so it must never be server-rendered.
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const snap = usePreviewSnapshot();
+
+  if (!isClient) {
+    return (
+      <HouseholdContext.Provider value={{ status: 'loading' }}>
+        {children}
+      </HouseholdContext.Provider>
+    );
+  }
+
+  const value: HouseholdState = {
+    status: 'ready',
+    household: snap.household,
+    members: snap.members,
+    places: snap.places,
+    logs: snap.logs,
+    actor: snap.actor,
+    isOwner: snap.members.some((m) => m.uid === snap.actor.uid && m.role === 'owner'),
+  };
+  return <HouseholdContext.Provider value={value}>{children}</HouseholdContext.Provider>;
+}
+
+/** Watches which household is active for this user, then mounts its data subscriptions. */
+function WatchedHouseholdProvider({ children }: { children: ReactNode }) {
   const auth = useSignedIn();
   const [pointer, setPointer] = useState<string | null | undefined>(undefined);
   const [error, setError] = useState<Error | null>(null);

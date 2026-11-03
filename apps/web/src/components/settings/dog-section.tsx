@@ -4,13 +4,13 @@ import { updateHousehold } from '@/lib/data/household';
 import { useHousehold } from '@/providers/household-provider';
 
 import { HouseholdForm } from '../household-form';
-import { Card, cx } from '../ui';
+import { Card, SectionHeading } from '../ui';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-line py-2 last:border-b-0">
-      <dt className="text-sm text-ink-muted">{label}</dt>
-      <dd className="text-right font-medium">{value}</dd>
+    <div className="flex items-baseline justify-between gap-4 border-t border-line py-2.5 first:border-t-0 first:pt-0">
+      <dt className="text-sm font-medium text-ink-muted">{label}</dt>
+      <dd className="text-right font-semibold">{value}</dd>
     </div>
   );
 }
@@ -20,12 +20,7 @@ export function DogSection() {
 
   return (
     <section aria-labelledby="dog-heading" className="flex flex-col gap-3">
-      <h2
-        id="dog-heading"
-        className={cx('text-sm font-semibold uppercase tracking-wide')}
-      >
-        Dog &amp; household
-      </h2>
+      <SectionHeading id="dog-heading">Dog &amp; household</SectionHeading>
       <Card>
         {isOwner ? (
           <HouseholdForm

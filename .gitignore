@@ -42,3 +42,6 @@ yarn-error.log*
 
 # Kilo / agent tooling state (worktrees live in .kilo/worktrees)
 .kilo/
+
+# Impeccable design-skill working state (local only)
+.impeccable/

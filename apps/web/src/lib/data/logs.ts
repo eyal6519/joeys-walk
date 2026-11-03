@@ -15,6 +15,12 @@ import {
 import { logInputSchema, type LogInput, type LogRecord } from '@walklogger/shared';
 
 import { logFromDoc } from '@/lib/firebase/converters';
+import { isPreview } from '@/lib/preview';
+import {
+  previewCreateLog,
+  previewDeleteLog,
+  previewUpdateLog,
+} from '@/lib/preview/store';
 
 import { logsCol, type Actor } from './refs';
 
@@ -40,6 +46,10 @@ function logPayload(input: LogInput) {
  */
 export function createLog(hid: string, actor: Actor, raw: LogInput): Promise<void> {
   const input = logInputSchema.parse(raw);
+  if (isPreview()) {
+    previewCreateLog(input, actor);
+    return Promise.resolve();
+  }
   return setDoc(doc(logsCol(hid)), {
     ...logPayload(input),
     createdBy: actor.uid,
@@ -51,6 +61,10 @@ export function createLog(hid: string, actor: Actor, raw: LogInput): Promise<voi
 
 export function updateLog(hid: string, id: string, raw: LogInput): Promise<void> {
   const input = logInputSchema.parse(raw);
+  if (isPreview()) {
+    previewUpdateLog(id, input);
+    return Promise.resolve();
+  }
   return updateDoc(doc(logsCol(hid), id), {
     ...logPayload(input),
     updatedAt: serverTimestamp(),
@@ -58,6 +72,10 @@ export function updateLog(hid: string, id: string, raw: LogInput): Promise<void>
 }
 
 export function deleteLog(hid: string, id: string): Promise<void> {
+  if (isPreview()) {
+    previewDeleteLog(id);
+    return Promise.resolve();
+  }
   return deleteDoc(doc(logsCol(hid), id));
 }
 

@@ -22,7 +22,7 @@ export function TextField({
     .join(' ');
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium">
+      <label htmlFor={id} className="text-[13px] font-bold">
         {label}
       </label>
       <input
@@ -38,7 +38,7 @@ export function TextField({
         </p>
       ) : null}
       {error ? (
-        <p id={`${id}-err`} role="alert" className="text-xs text-danger">
+        <p id={`${id}-err`} role="alert" className="text-xs font-medium text-danger">
           {error}
         </p>
       ) : null}
@@ -55,19 +55,19 @@ export function TextArea({
   const id = useId();
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium">
+      <label htmlFor={id} className="text-[13px] font-bold">
         {label}
       </label>
       <textarea
         id={id}
         rows={3}
         aria-invalid={error ? true : undefined}
-        className={cx(inputClass, 'py-2', error && 'border-danger')}
+        className={cx(inputClass, 'py-3', error && 'border-danger')}
         {...props}
       />
       {hint ? <p className="text-xs text-ink-muted">{hint}</p> : null}
       {error ? (
-        <p role="alert" className="text-xs text-danger">
+        <p role="alert" className="text-xs font-medium text-danger">
           {error}
         </p>
       ) : null}
@@ -85,6 +85,7 @@ export function ChoiceGroup<T extends string>({
   onChange,
   options,
   error,
+  columns,
 }: {
   legend: string;
   name: string;
@@ -92,11 +93,19 @@ export function ChoiceGroup<T extends string>({
   onChange: (value: T) => void;
   options: readonly Option<T>[];
   error?: string | null;
+  columns?: number;
 }) {
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1 text-sm font-medium">{legend}</legend>
-      <div className="flex flex-wrap gap-2">
+      <legend className="mb-1 text-[13px] font-bold">{legend}</legend>
+      <div
+        className={cx('grid gap-2.5', columns ? undefined : 'grid-cols-2')}
+        style={
+          columns
+            ? { gridTemplateColumns: `repeat(${columns}, minmax(0,1fr))` }
+            : undefined
+        }
+      >
         {options.map((option) => (
           <label key={option.value} className="cursor-pointer">
             <input
@@ -109,20 +118,26 @@ export function ChoiceGroup<T extends string>({
             />
             <span
               className={cx(
-                'flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface-raised px-4',
-                'transition peer-checked:border-brand-strong peer-checked:bg-brand-soft',
-                'peer-checked:font-semibold peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2',
+                'flex min-h-14 items-center gap-2.5 rounded-control border border-line bg-surface-raised px-4',
+                'text-[15px] font-semibold text-ink-soft',
+                'transition-[border-color,background-color,color] duration-150',
+                'peer-checked:border-brand-strong peer-checked:bg-brand-soft peer-checked:text-ink',
+                'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2',
                 'peer-focus-visible:outline-brand-strong',
               )}
             >
-              {option.icon ? <span aria-hidden="true">{option.icon}</span> : null}
+              {option.icon ? (
+                <span aria-hidden="true" className="shrink-0">
+                  {option.icon}
+                </span>
+              ) : null}
               {option.label}
             </span>
           </label>
         ))}
       </div>
       {error ? (
-        <p role="alert" className="text-xs text-danger">
+        <p role="alert" className="text-xs font-medium text-danger">
           {error}
         </p>
       ) : null}

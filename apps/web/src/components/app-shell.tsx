@@ -7,13 +7,14 @@ import { useEffect, type ReactNode } from 'react';
 import { HouseholdProvider, useHouseholdState } from '@/providers/household-provider';
 import { useAuth } from '@/providers/auth-provider';
 
+import { ChartIcon, GearIcon, HomeIcon, LogbookIcon } from './icons';
 import { Button, cx, ErrorNote, Spinner } from './ui';
 
 const NAV = [
-  { href: '/', label: 'Today', icon: '🏠' },
-  { href: '/history', label: 'History', icon: '📖' },
-  { href: '/stats', label: 'Stats', icon: '📊' },
-  { href: '/settings', label: 'Settings', icon: '⚙️' },
+  { href: '/', label: 'Today', Icon: HomeIcon },
+  { href: '/history', label: 'History', Icon: LogbookIcon },
+  { href: '/stats', label: 'Stats', Icon: ChartIcon },
+  { href: '/settings', label: 'Settings', Icon: GearIcon },
 ] as const;
 
 function GateRedirect({ to }: { to: string }) {
@@ -46,26 +47,31 @@ function BottomNav() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-raised pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-raised pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_24px_-20px_rgb(36_28_21_/_0.5)]"
     >
       <ul className="mx-auto flex max-w-2xl">
-        {NAV.map((item) => {
-          const active =
-            item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+        {NAV.map(({ href, label, Icon }) => {
+          const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (
-            <li key={item.href} className="flex-1">
+            <li key={href} className="flex-1">
               <Link
-                href={item.href}
+                href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cx(
-                  'flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs',
-                  active ? 'font-semibold text-brand-strong' : 'text-ink-muted',
+                  'group relative flex min-h-16 flex-col items-center justify-center gap-1 text-[11px] font-semibold',
+                  'transition-colors duration-150',
+                  active ? 'text-ink' : 'text-ink-muted hover:text-ink-soft',
                 )}
               >
-                <span aria-hidden="true" className="text-lg">
-                  {item.icon}
-                </span>
-                {item.label}
+                <span
+                  aria-hidden="true"
+                  className={cx(
+                    'absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-brand transition-opacity duration-150',
+                    active ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
+                <Icon size={23} />
+                {label}
               </Link>
             </li>
           );
@@ -85,8 +91,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Gate>
           <main
             className={cx(
-              'mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-8',
-              hideNav ? 'pb-10' : 'pb-28',
+              'mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-7',
+              hideNav ? 'pb-12' : 'pb-28',
             )}
           >
             {children}

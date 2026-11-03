@@ -15,15 +15,19 @@ import { fromLocalInputValue, toLocalInputValue } from '@/lib/utils/datetime';
 import { useHousehold } from '@/providers/household-provider';
 
 import { ChoiceGroup, TextArea, TextField, type Option } from './form';
+import { PawIcon, PinIcon, PlusIcon } from './icons';
 import { LogTypeToggle } from './log-type-toggle';
+import { POTTY_ICON, POTTY_ICON_COLOR, POTTY_LABEL, POTTY_ORDER } from './potty';
 import { Button, ErrorNote } from './ui';
 
-const WALK_OPTIONS: readonly Option<Potty>[] = [
-  { value: 'pee', label: 'Pee', icon: '💧' },
-  { value: 'poop', label: 'Poop', icon: '💩' },
-  { value: 'both', label: 'Both', icon: '💧💩' },
-  { value: 'neither', label: 'Neither', icon: '➖' },
-];
+const WALK_OPTIONS: readonly Option<Potty>[] = POTTY_ORDER.map((value) => {
+  const Icon = POTTY_ICON[value];
+  return {
+    value,
+    label: POTTY_LABEL[value],
+    icon: <Icon size={20} className={POTTY_ICON_COLOR[value]} />,
+  };
+});
 const HOME_OPTIONS = WALK_OPTIONS.filter((o) => o.value !== 'neither');
 
 export type LogFormInitial = {
@@ -73,16 +77,25 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
     ...members.map((m) => ({
       value: m.uid,
       label: m.uid === actor.uid ? `${m.displayName} (me)` : m.displayName,
+      icon: <PawIcon size={19} className="text-ink-muted" />,
     })),
-    { value: OTHER, label: 'Someone else' },
+    {
+      value: OTHER,
+      label: 'Someone else',
+      icon: <PlusIcon size={19} className="text-ink-muted" />,
+    },
   ];
   const placeOptions: Option<string>[] = [
     ...selectable.map((p) => ({
       value: p.id,
       label: p.label,
-      icon: p.icon ?? undefined,
+      icon: <PinIcon size={19} className="text-ink-muted" />,
     })),
-    { value: OTHER, label: 'Somewhere else', icon: '✏️' },
+    {
+      value: OTHER,
+      label: 'Somewhere else',
+      icon: <PlusIcon size={19} className="text-ink-muted" />,
+    },
   ];
 
   function changeType(next: LogType) {
@@ -114,11 +127,11 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5" noValidate>
+    <form onSubmit={submit} className="flex flex-col gap-6" noValidate>
       {!existing && <LogTypeToggle value={type} onChange={changeType} />}
 
       <ChoiceGroup
-        legend={type === 'walk' ? 'What did Joey do?' : 'What was found?'}
+        legend={type === 'walk' ? 'What did Joey do?' : 'What did you find?'}
         name="potty"
         value={potty}
         onChange={setPotty}
@@ -143,10 +156,12 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
               error={errors.walkerName}
               maxLength={60}
               autoComplete="off"
+              placeholder="e.g. Alex"
             />
           )}
           <TextField
             label="How long (minutes)"
+            hint="Leave blank if you are not sure."
             type="number"
             inputMode="numeric"
             min={0}
@@ -160,7 +175,7 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
       ) : (
         <>
           <ChoiceGroup
-            legend="Where?"
+            legend="Where did you find it?"
             name="place"
             value={place}
             onChange={setPlace}
@@ -181,7 +196,7 @@ export function LogForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
       )}
 
       <TextField
-        label={type === 'walk' ? 'When did the walk start?' : 'When was it found?'}
+        label={type === 'walk' ? 'When did the walk start?' : 'When did you find it?'}
         type="datetime-local"
         value={when}
         onChange={(e) => setWhen(e.target.value)}

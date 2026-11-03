@@ -8,7 +8,7 @@ import { leaveHousehold } from '@/lib/data/household';
 import { useHousehold } from '@/providers/household-provider';
 import { useToast } from '@/providers/toast-provider';
 
-import { Button, Card } from '../ui';
+import { Button, Card, SectionHeading } from '../ui';
 
 export function AccountSection() {
   const router = useRouter();
@@ -31,9 +31,7 @@ export function AccountSection() {
 
   return (
     <section aria-labelledby="account-heading" className="flex flex-col gap-3">
-      <h2 id="account-heading" className="text-sm font-semibold uppercase tracking-wide">
-        Account
-      </h2>
+      <SectionHeading id="account-heading">Account</SectionHeading>
       <Card className="flex flex-col gap-3">
         <Button
           variant="secondary"

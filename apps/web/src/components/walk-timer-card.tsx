@@ -7,7 +7,8 @@ import { formatStopwatch } from '@walklogger/shared';
 import { useNow } from '@/lib/hooks/use-now';
 import { clearWalkTimer, startWalkTimer, useWalkTimerStart } from '@/lib/walk-timer';
 
-import { Button, buttonClass, Card } from './ui';
+import { TimerIcon, WalkIcon } from './icons';
+import { ActionTile, buttonClass, Button } from './ui';
 
 /** Start/stop timer for a walk. The start time is persisted, so closing the app does not lose it. */
 export function WalkTimerCard() {
@@ -16,24 +17,25 @@ export function WalkTimerCard() {
 
   if (startedAt === null) {
     return (
-      <Card className="flex flex-col gap-3">
-        <div>
-          <h2 className="font-semibold">Going for a walk?</h2>
-          <p className="text-sm text-ink-muted">
-            Start the timer and log what happened when you are back.
-          </p>
-        </div>
-        <Button onClick={startWalkTimer}>🦮 Start walk</Button>
-      </Card>
+      <ActionTile
+        onClick={startWalkTimer}
+        icon={WalkIcon}
+        title="Going for a walk?"
+        subtitle="Start the timer"
+        tone="live"
+      />
     );
   }
 
   return (
-    <Card className="flex flex-col gap-3 border-brand-strong bg-brand-soft">
-      <div>
-        <h2 className="font-semibold">Walk in progress</h2>
+    <div className="flex flex-col gap-4 rounded-control border border-live/40 bg-[color-mix(in_oklab,var(--color-live)_10%,var(--color-surface-raised))] p-4 shadow-card">
+      <div className="flex items-center justify-between gap-3">
+        <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.14em] text-live">
+          <TimerIcon size={15} />
+          Walk in progress
+        </span>
         <p
-          className="text-4xl font-semibold tabular-nums"
+          className="font-display text-3xl font-extrabold tabular-nums"
           role="timer"
           aria-label={`Elapsed ${formatStopwatch(now.getTime() - startedAt)}`}
         >
@@ -56,6 +58,6 @@ export function WalkTimerCard() {
           Discard
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }

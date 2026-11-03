@@ -26,7 +26,7 @@ function Onboarding() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-5 py-10">
       <PageHeader
-        title="Let’s meet your dog 🐩"
+        title="Let’s meet your dog"
         subtitle="This takes a minute. You can change everything later."
       />
       <Card>

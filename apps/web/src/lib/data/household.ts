@@ -23,6 +23,12 @@ import {
 
 import { getDb } from '@/lib/firebase/client';
 import { householdFromData, memberFromDoc } from '@/lib/firebase/converters';
+import { isPreview } from '@/lib/preview';
+import {
+  previewRemoveMember,
+  previewRenameSelf,
+  previewUpdateHousehold,
+} from '@/lib/preview/store';
 
 import { householdDoc, inviteDoc, membersCol, userDoc, type Actor } from './refs';
 
@@ -69,6 +75,7 @@ export async function createHousehold(
   raw: HouseholdInput,
 ): Promise<string> {
   const input = householdInputSchema.parse(raw);
+  if (isPreview()) return 'preview';
   const db = getDb();
   const ref = doc(collection(db, 'households'));
   const batch = writeBatch(db);
@@ -110,7 +117,12 @@ export function watchHousehold(
 }
 
 export async function updateHousehold(hid: string, raw: HouseholdInput): Promise<void> {
-  await updateDoc(householdDoc(hid), dogFields(householdInputSchema.parse(raw)));
+  const input = householdInputSchema.parse(raw);
+  if (isPreview()) {
+    previewUpdateHousehold(input);
+    return;
+  }
+  await updateDoc(householdDoc(hid), dogFields(input));
 }
 
 export type InvitePreview = {
@@ -127,6 +139,7 @@ export async function createInvite(
   const code = generateInviteCode();
   // One minute short of the TTL so server-side clock skew can never exceed the rule's cap.
   const expiresAt = new Date(Date.now() + INVITE_TTL_DAYS * 24 * 3600_000 - 60_000);
+  if (isPreview()) return { code: 'PREVIEW-INVITE', expiresAt };
   await setDoc(inviteDoc(code), {
     householdId: household.id,
     householdName: household.name,
@@ -139,6 +152,7 @@ export async function createInvite(
 }
 
 export async function previewInvite(code: string): Promise<InvitePreview | null> {
+  if (isPreview()) return null;
   const snap = await getDoc(inviteDoc(code));
   if (!snap.exists()) return null;
   const d = snap.data();
@@ -184,14 +198,23 @@ export function watchMembers(
 }
 
 export async function removeMember(hid: string, uid: string): Promise<void> {
+  if (isPreview()) {
+    previewRemoveMember(uid);
+    return;
+  }
   await deleteDoc(doc(membersCol(hid), uid));
 }
 
 export async function renameSelf(hid: string, uid: string, name: string): Promise<void> {
+  if (isPreview()) {
+    previewRenameSelf(uid, name);
+    return;
+  }
   await updateDoc(doc(membersCol(hid), uid), { displayName: name.trim() });
 }
 
 export async function clearActiveHousehold(actor: Actor): Promise<void> {
+  if (isPreview()) return;
   await setDoc(userDoc(actor.uid), pointerData(null, actor.name));
 }
 
@@ -201,6 +224,7 @@ export async function clearActiveHousehold(actor: Actor): Promise<void> {
  * the UI hides the button for them.
  */
 export async function leaveHousehold(actor: Actor, hid: string): Promise<void> {
+  if (isPreview()) return;
   const batch = writeBatch(getDb());
   batch.delete(doc(membersCol(hid), actor.uid));
   batch.set(userDoc(actor.uid), pointerData(null, actor.name));

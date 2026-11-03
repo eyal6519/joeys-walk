@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   reactStrictMode: true,
 
+  // The floating "N" route-status button in `next dev` is a framework overlay,
+  // not the app. Hidden so design previews show only Joey's Log.
+  devIndicators: false,
+
   // The workspace package ships raw TypeScript, so Next must compile it.
   transpilePackages: ['@walklogger/shared'],
 

@@ -121,13 +121,13 @@ export type Place = {
   archived: boolean;
 };
 
-export const DEFAULT_PLACES: readonly { label: string; icon: string }[] = [
-  { label: 'Living room', icon: '🛋️' },
-  { label: 'Kitchen', icon: '🍳' },
-  { label: 'Bedroom', icon: '🛏️' },
-  { label: 'Bathroom', icon: '🚿' },
-  { label: 'Hallway', icon: '🚪' },
-  { label: 'Balcony', icon: '🌿' },
+export const DEFAULT_PLACES: readonly { label: string; icon: string | null }[] = [
+  { label: 'Living room', icon: null },
+  { label: 'Kitchen', icon: null },
+  { label: 'Bedroom', icon: null },
+  { label: 'Bathroom', icon: null },
+  { label: 'Hallway', icon: null },
+  { label: 'Balcony', icon: null },
 ];
 
 export const householdInputSchema = z.object({

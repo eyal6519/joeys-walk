@@ -18,6 +18,7 @@ import { isEmulatorMode } from '@/lib/firebase/client';
 import { useAuth } from '@/providers/auth-provider';
 
 import { TextField } from './form';
+import { GoogleIcon, MailIcon, PawIcon } from './icons';
 import { Button, Card, ErrorNote, Spinner } from './ui';
 
 /** Only same-site relative paths are allowed as a post-login target (no open redirects). */
@@ -97,11 +98,16 @@ export function SignInForm() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-6 px-5 py-10">
-      <header className="flex flex-col items-center gap-2 text-center">
-        <span aria-hidden="true" className="text-5xl">
-          🐩
-        </span>
-        <h1 className="text-3xl font-semibold tracking-tight">{siteConfig.name}</h1>
+      <header className="flex flex-col items-center gap-3 text-center">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="grid size-12 place-items-center rounded-[0.9rem] bg-brand-strong text-on-brand shadow-card"
+          >
+            <PawIcon size={26} />
+          </span>
+          <h1 className="text-3xl font-extrabold tracking-tight">{siteConfig.name}</h1>
+        </div>
         <p className="text-ink-muted">{siteConfig.tagline}</p>
       </header>
 
@@ -111,6 +117,7 @@ export function SignInForm() {
           disabled={busy}
           onClick={() => void run(signInWithGoogle)}
         >
+          <GoogleIcon size={20} />
           Continue with Google
         </Button>
 
@@ -153,6 +160,7 @@ export function SignInForm() {
               }
             />
             <Button type="submit" disabled={busy}>
+              <MailIcon size={19} />
               {needsEmail ? 'Finish signing in' : 'Email me a sign-in link'}
             </Button>
           </form>

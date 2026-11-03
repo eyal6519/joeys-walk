@@ -48,7 +48,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={toast.id}
             role={toast.tone === 'error' ? 'alert' : 'status'}
             className={
-              'pointer-events-auto max-w-md rounded-xl px-4 py-3 text-sm shadow-lg ' +
+              'pointer-events-auto max-w-md rounded-control px-4 py-3 text-sm font-semibold shadow-pop ' +
               (toast.tone === 'error' ? 'bg-danger text-white' : 'bg-ink text-surface')
             }
           >

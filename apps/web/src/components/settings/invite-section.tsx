@@ -6,7 +6,8 @@ import { createInvite } from '@/lib/data/household';
 import { useHousehold } from '@/providers/household-provider';
 import { useToast } from '@/providers/toast-provider';
 
-import { Button, Card, ErrorNote, inputClass } from '../ui';
+import { ShareIcon } from '../icons';
+import { Button, Card, ErrorNote, inputClass, SectionHeading } from '../ui';
 
 export function InviteSection() {
   const { household, actor } = useHousehold();
@@ -56,9 +57,7 @@ export function InviteSection() {
 
   return (
     <section aria-labelledby="invite-heading" className="flex flex-col gap-3">
-      <h2 id="invite-heading" className="text-sm font-semibold uppercase tracking-wide">
-        Invite someone
-      </h2>
+      <SectionHeading id="invite-heading">Invite someone</SectionHeading>
       <Card className="flex flex-col gap-3">
         <p className="text-sm text-ink-muted">
           Share a link so someone can help look after {household.dogName}. Links expire
@@ -93,6 +92,7 @@ export function InviteSection() {
           </div>
         ) : (
           <Button disabled={busy} className="self-start" onClick={() => void generate()}>
+            <ShareIcon size={18} />
             {busy ? 'Creating…' : 'Create invite link'}
           </Button>
         )}

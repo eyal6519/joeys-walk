@@ -3,6 +3,7 @@ node_modules/
 out/
 coverage/
 .kilo/
+.impeccable/
 package-lock.json
 public/sw*
 *.md

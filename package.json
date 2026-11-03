@@ -13,6 +13,7 @@
   "scripts": {
     "start": "node scripts/run-local.mjs",
     "dev": "npm run dev --workspace @walklogger/web",
+    "preview": "npm run dev:preview --workspace @walklogger/web",
     "build": "npm run build --workspace @walklogger/web",
     "lint": "npm run lint --workspace @walklogger/web",
     "typecheck": "npm run typecheck --workspaces --if-present",

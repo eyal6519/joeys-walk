@@ -16,8 +16,8 @@ import type { DayBucket } from '@walklogger/shared';
 import { formatShortDate } from '@/lib/utils/datetime';
 
 /** Chart colours are CSS variables so dark mode needs no extra work. */
-const PEE = 'var(--color-brand)';
-const POOP = '#8b6a4f';
+const PEE = 'var(--color-pee)';
+const POOP = 'var(--color-poop)';
 
 export function DailyPottyChart({ buckets }: { buckets: DayBucket[] }) {
   const data = buckets.map((b) => ({

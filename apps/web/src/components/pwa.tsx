@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { PawIcon } from './icons';
 import { Button, Card } from './ui';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -43,9 +44,12 @@ export function Pwa() {
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-28 z-40 flex justify-center px-4">
-      <Card className="pointer-events-auto flex w-full max-w-md items-center gap-3 shadow-lg">
-        <span aria-hidden="true" className="text-2xl">
-          🐩
+      <Card className="pointer-events-auto flex w-full max-w-md items-center gap-3 shadow-pop">
+        <span
+          aria-hidden="true"
+          className="grid size-10 shrink-0 place-items-center rounded-[0.7rem] bg-brand-soft text-brand-strong"
+        >
+          <PawIcon size={22} />
         </span>
         <p className="flex-1 text-sm">
           Add Joey&rsquo;s Log to your home screen for quick offline logging.

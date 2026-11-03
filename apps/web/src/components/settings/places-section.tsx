@@ -8,11 +8,12 @@ import { addPlace, deletePlace, reorderPlaces, updatePlace } from '@/lib/data/pl
 import { useHousehold } from '@/providers/household-provider';
 import { useToast } from '@/providers/toast-provider';
 
-import { Button, Card, cx, EmptyState, ErrorNote, inputClass } from '../ui';
+import { ChevronDownIcon, ChevronUpIcon, PinIcon } from '../icons';
+import { Button, Card, EmptyState, ErrorNote, inputClass, SectionHeading } from '../ui';
 
-type Draft = { label: string; icon: string };
+type Draft = { label: string };
 
-const EMPTY: Draft = { label: '', icon: '' };
+const EMPTY: Draft = { label: '' };
 
 function PlaceRow({
   place,
@@ -28,11 +29,14 @@ function PlaceRow({
   onEdit: () => void;
 }) {
   return (
-    <li className="flex items-center gap-2 border-b border-line py-2 last:border-b-0">
-      <span aria-hidden="true" className="w-6 text-center text-lg">
-        {place.icon ?? '📍'}
+    <li className="flex items-center gap-2 border-t border-line py-2.5 first:border-t-0">
+      <span
+        aria-hidden="true"
+        className="grid size-9 shrink-0 place-items-center rounded-[0.6rem] bg-surface-sunken text-ink-muted"
+      >
+        <PinIcon size={18} />
       </span>
-      <span className="flex-1 truncate">{place.label}</span>
+      <span className="flex-1 truncate font-semibold">{place.label}</span>
       <div className="flex items-center gap-1">
         <Button
           variant="ghost"
@@ -41,7 +45,7 @@ function PlaceRow({
           className="min-h-9 px-2"
           onClick={() => onMove(-1)}
         >
-          ↑
+          <ChevronUpIcon size={18} />
         </Button>
         <Button
           variant="ghost"
@@ -50,7 +54,7 @@ function PlaceRow({
           className="min-h-9 px-2"
           onClick={() => onMove(1)}
         >
-          ↓
+          <ChevronDownIcon size={18} />
         </Button>
         <Button variant="ghost" className="min-h-9 px-3 text-sm" onClick={onEdit}>
           Edit
@@ -88,10 +92,7 @@ export function PlacesSection() {
 
   function add(event: FormEvent) {
     event.preventDefault();
-    const parsed = placeInputSchema.safeParse({
-      label: draft.label,
-      icon: draft.icon.trim() || null,
-    });
+    const parsed = placeInputSchema.safeParse({ label: draft.label, icon: null });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? 'Check the details');
       return;
@@ -106,16 +107,13 @@ export function PlacesSection() {
 
   function startEdit(place: Place) {
     setEditingId(place.id);
-    setEditDraft({ label: place.label, icon: place.icon ?? '' });
+    setEditDraft({ label: place.label });
     setError(null);
   }
 
   function saveEdit(event: FormEvent, place: Place) {
     event.preventDefault();
-    const parsed = placeInputSchema.safeParse({
-      label: editDraft.label,
-      icon: editDraft.icon.trim() || null,
-    });
+    const parsed = placeInputSchema.safeParse({ label: editDraft.label, icon: null });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? 'Check the details');
       return;
@@ -144,20 +142,22 @@ export function PlacesSection() {
 
   return (
     <section aria-labelledby="places-heading" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h2 id="places-heading" className="text-sm font-semibold uppercase tracking-wide">
-          Places at home
-        </h2>
-        {!adding && (
-          <Button
-            variant="ghost"
-            className="min-h-9 px-3 text-sm"
-            onClick={() => setAdding(true)}
-          >
-            Add
-          </Button>
-        )}
-      </div>
+      <SectionHeading
+        id="places-heading"
+        action={
+          !adding && (
+            <Button
+              variant="ghost"
+              className="min-h-9 px-3 text-sm"
+              onClick={() => setAdding(true)}
+            >
+              Add
+            </Button>
+          )
+        }
+      >
+        Places at home
+      </SectionHeading>
 
       <Card className="flex flex-col gap-3">
         {error ? <ErrorNote>{error}</ErrorNote> : null}
@@ -165,27 +165,17 @@ export function PlacesSection() {
         {adding && (
           <form
             onSubmit={add}
-            className="flex flex-col gap-2 rounded-xl border border-line p-3"
+            className="flex flex-col gap-2.5 rounded-control border border-line p-3"
           >
-            <div className="flex gap-2">
-              <input
-                aria-label="Icon (optional)"
-                className={cx(inputClass, 'w-16 text-center')}
-                placeholder="📍"
-                maxLength={8}
-                value={draft.icon}
-                onChange={(e) => setDraft({ ...draft, icon: e.target.value })}
-              />
-              <input
-                aria-label="Place name"
-                className={inputClass}
-                placeholder="e.g. Balcony"
-                maxLength={40}
-                autoFocus
-                value={draft.label}
-                onChange={(e) => setDraft({ ...draft, label: e.target.value })}
-              />
-            </div>
+            <input
+              aria-label="Place name"
+              className={inputClass}
+              placeholder="e.g. Balcony"
+              maxLength={40}
+              autoFocus
+              value={draft.label}
+              onChange={(e) => setDraft({ label: e.target.value })}
+            />
             <div className="flex gap-2">
               <Button type="submit" className="flex-1">
                 Add place
@@ -213,31 +203,18 @@ export function PlacesSection() {
           <ul className="flex flex-col">
             {active.map((place, i) =>
               editingId === place.id ? (
-                <li key={place.id}>
+                <li key={place.id} className="border-t border-line first:border-t-0">
                   <form
                     onSubmit={(e) => saveEdit(e, place)}
-                    className="flex flex-col gap-2 py-2"
+                    className="flex flex-col gap-2.5 py-3"
                   >
-                    <div className="flex gap-2">
-                      <input
-                        aria-label="Icon (optional)"
-                        className={cx(inputClass, 'w-16 text-center')}
-                        maxLength={8}
-                        value={editDraft.icon}
-                        onChange={(e) =>
-                          setEditDraft({ ...editDraft, icon: e.target.value })
-                        }
-                      />
-                      <input
-                        aria-label="Place name"
-                        className={inputClass}
-                        maxLength={40}
-                        value={editDraft.label}
-                        onChange={(e) =>
-                          setEditDraft({ ...editDraft, label: e.target.value })
-                        }
-                      />
-                    </div>
+                    <input
+                      aria-label="Place name"
+                      className={inputClass}
+                      maxLength={40}
+                      value={editDraft.label}
+                      onChange={(e) => setEditDraft({ label: e.target.value })}
+                    />
                     <div className="flex gap-2">
                       <Button type="submit" className="flex-1">
                         Save
@@ -248,7 +225,7 @@ export function PlacesSection() {
                     </div>
                     <button
                       type="button"
-                      className="self-start text-sm text-danger underline"
+                      className="self-start text-sm font-semibold text-danger underline"
                       onClick={() => {
                         setArchived(place, true);
                         setEditingId(null);
@@ -275,17 +252,24 @@ export function PlacesSection() {
 
       {archived.length > 0 && (
         <Card className="flex flex-col gap-2">
-          <h3 className="text-sm font-medium text-ink-muted">Archived</h3>
+          <h3 className="text-[13px] font-bold uppercase tracking-[0.14em] text-ink-muted">
+            Archived
+          </h3>
           <ul className="flex flex-col">
             {archived.map((place) => (
               <li
                 key={place.id}
-                className="flex items-center gap-2 border-b border-line py-2 last:border-b-0"
+                className="flex items-center gap-2 border-t border-line py-2.5 first:border-t-0"
               >
-                <span aria-hidden="true" className="w-6 text-center text-lg opacity-60">
-                  {place.icon ?? '📍'}
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-[0.6rem] bg-surface-sunken text-ink-muted opacity-60"
+                >
+                  <PinIcon size={18} />
                 </span>
-                <span className="flex-1 truncate text-ink-muted">{place.label}</span>
+                <span className="flex-1 truncate font-medium text-ink-muted">
+                  {place.label}
+                </span>
                 <Button
                   variant="ghost"
                   className="min-h-9 px-3 text-sm"

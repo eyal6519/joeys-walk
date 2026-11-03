@@ -13,7 +13,7 @@ export const siteConfig = {
   dogName: 'Joey',
   dogBreed: 'Toy Poodle',
   themeColor: '#a9713f',
-  backgroundColor: '#fdf8f3',
+  backgroundColor: '#f5f2ec',
   locale: 'en',
   startUrl: '/',
 } as const;

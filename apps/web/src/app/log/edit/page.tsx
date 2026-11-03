@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { LogForm } from '@/components/log-form';
-import { Button, EmptyState, PageHeader, Spinner } from '@/components/ui';
+import { Button, Card, EmptyState, PageHeader, Spinner } from '@/components/ui';
 import { deleteLog, updateLog } from '@/lib/data/logs';
 import { useHousehold } from '@/providers/household-provider';
 import { useToast } from '@/providers/toast-provider';
@@ -32,23 +32,25 @@ function EditLog() {
   return (
     <>
       <PageHeader title="Edit entry" subtitle={`Logged by ${log.createdByName}`} />
-      <LogForm
-        initial={{
-          type: log.type,
-          occurredAt: log.occurredAt,
-          durationMin: log.durationMin,
-          existing: log,
-        }}
-        submitLabel="Save changes"
-        onCancel={() => router.back()}
-        onSubmit={(input) => {
-          updateLog(household.id, log.id, input).catch((e: Error) =>
-            toast(`Could not save changes: ${e.message}`, 'error'),
-          );
-          toast('Saved', 'info');
-          router.replace('/history');
-        }}
-      />
+      <Card>
+        <LogForm
+          initial={{
+            type: log.type,
+            occurredAt: log.occurredAt,
+            durationMin: log.durationMin,
+            existing: log,
+          }}
+          submitLabel="Save changes"
+          onCancel={() => router.back()}
+          onSubmit={(input) => {
+            updateLog(household.id, log.id, input).catch((e: Error) =>
+              toast(`Could not save changes: ${e.message}`, 'error'),
+            );
+            toast('Saved', 'info');
+            router.replace('/history');
+          }}
+        />
+      </Card>
       {canDelete && (
         <Button
           variant="danger"

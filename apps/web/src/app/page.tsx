@@ -6,8 +6,9 @@ import { startOfDay } from '@walklogger/shared';
 
 import { LogItem } from '@/components/log-item';
 import { TodaySummary } from '@/components/today-summary';
-import { buttonClass, EmptyState, PageHeader } from '@/components/ui';
 import { WalkTimerCard } from '@/components/walk-timer-card';
+import { PawIcon, PinIcon, PlusIcon } from '@/components/icons';
+import { ActionTile, EmptyState, SectionHeading } from '@/components/ui';
 import { useNow } from '@/lib/hooks/use-now';
 import { useHousehold } from '@/providers/household-provider';
 
@@ -19,32 +20,56 @@ function Dashboard() {
 
   return (
     <>
-      <PageHeader title={`${household.dogName}'s day 🐩`} subtitle={household.name} />
+      <header className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="grid size-11 place-items-center rounded-[0.9rem] bg-brand-strong text-on-brand shadow-card"
+        >
+          <PawIcon size={24} />
+        </span>
+        <div className="flex flex-col">
+          <h1 className="font-display text-[22px] font-extrabold leading-none">
+            Joey&rsquo;s Log
+          </h1>
+          <p className="text-[13px] font-medium text-ink-muted">{household.name}</p>
+        </div>
+      </header>
+
       <TodaySummary logs={logs} now={now} dogName={household.dogName} />
-      <WalkTimerCard />
-      <Link href="/log?type=home" className={buttonClass('secondary')}>
-        🏠 Found something at home
-      </Link>
+
+      <div className="flex flex-col gap-3">
+        <ActionTile
+          href="/log?type=home"
+          icon={PinIcon}
+          title="Found something at home"
+          subtitle="Pee or poop, and where"
+          tone="brand"
+        />
+        <WalkTimerCard />
+      </div>
 
       <section aria-labelledby="today-heading" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2
-            id="today-heading"
-            className="text-sm font-semibold uppercase tracking-wide"
-          >
-            Today
-          </h2>
-          <Link href="/log" className="text-sm font-medium text-brand-strong underline">
-            Add entry
-          </Link>
-        </div>
+        <SectionHeading
+          id="today-heading"
+          action={
+            <Link
+              href="/log"
+              className="inline-flex items-center gap-1 text-sm font-bold text-brand-strong hover:underline"
+            >
+              <PlusIcon size={16} />
+              Add entry
+            </Link>
+          }
+        >
+          Today
+        </SectionHeading>
         {today.length === 0 ? (
           <EmptyState
             title="Nothing logged today"
-            hint="Start a walk or log something you found."
+            hint="Start a walk or log something you found — it fills in from there."
           />
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-2.5">
             {today.map((log) => (
               <LogItem key={log.id} log={log} />
             ))}
