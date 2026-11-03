@@ -87,7 +87,7 @@ function DayRule({
                   'block size-2.5 rounded-full transition-[transform,box-shadow] duration-150',
                   home
                     ? 'bg-found ring-2 ring-surface'
-                    : 'bg-surface-raised ring-[1.5px] ring-line-strong',
+                    : 'bg-white ring-1 ring-line-strong',
                   selected && 'scale-125 ring-4',
                 )}
               />

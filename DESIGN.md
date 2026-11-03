@@ -170,7 +170,7 @@ most of the structural work; shadows only lift.
 - **TodaySummary** — the glance: a large tabular interval, what/where/who, a
   **day rule** (the day's events as ticks on a 24-hour rule with the current gap
   in brand and "now" as a cursor), and a four-count row. On the rule a **walk is
-  a light marker and an at-home find is the red `found` marker**; pressing a
+  a white marker and an at-home find is the red `found` marker**; pressing a
   marker reveals that entry's essentials inline below the rule (when, and by
   whom/what for a walk; when spotted and where for a find) — a non-modal reveal,
   never a modal for a task that needs no interruption.

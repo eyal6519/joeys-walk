@@ -45,3 +45,6 @@ yarn-error.log*
 
 # Impeccable design-skill working state (local only)
 .impeccable/
+
+# Local-only features & bugs working list
+BACKLOG.md

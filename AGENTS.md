@@ -4,6 +4,18 @@
 potty events, on Firebase (Auth + Firestore). npm workspaces monorepo. Read
 `HANDOFF.md` first for the fuller engineering state, then `README.md`.
 
+## Backlog workflow (do this, always)
+
+`BACKLOG.md` is the shared, local-only list of features and bugs. When the user
+reports a bug or proposes a feature:
+
+1. Add it to the correct section (Features or Bugs) in `BACKLOG.md`.
+2. Rephrase it concisely and professionally; keep the user's intent intact.
+3. Assign the next `#`, set status `open`, and stamp the captured date.
+4. Do **not** design, plan, or implement it, and do not ask how — capture only.
+
+`BACKLOG.md` is gitignored and must not be committed.
+
 ## Commands (run from the repo root)
 
 | Task | Command |
